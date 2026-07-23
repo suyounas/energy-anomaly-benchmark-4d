@@ -1,0 +1,11 @@
+Commodity,Method,Precision,Recall,F1
+WTI,LSTM Autoencoder,0.836,0.455,0.590
+WTI,Transformer Encoder,0.782,0.426,0.551
+WTI,Isolation Forest,0.614,0.347,0.443
+WTI,DBSCAN,0.452,0.277,0.344
+WTI,Rolling Z-score,0.375,0.030,0.055
+Henry Hub,LSTM Autoencoder,0.000,0.000,0.000
+Henry Hub,Transformer Encoder,0.000,0.000,0.000
+Henry Hub,Isolation Forest,0.175,0.099,0.127
+Henry Hub,DBSCAN,0.190,0.762,0.304
+Henry Hub,Rolling Z-score,0.250,0.040,0.068

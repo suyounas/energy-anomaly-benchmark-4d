@@ -1,0 +1,11 @@
+Dataset,Protocol,Method,Precision,Recall,F1,Recall_COVID,Recall_ColdSnap,FP_share_Beast_window
+GB Demand (NESO real),A (forward 70/30),LSTM Autoencoder,0.000,0.000,0.000,,0.00,0.000
+GB Demand (NESO real),A (forward 70/30),Transformer Encoder,0.000,0.000,0.000,,0.00,0.000
+GB Demand (NESO real),A (forward 70/30),Isolation Forest,0.000,0.000,0.000,,0.00,0.000
+GB Demand (NESO real),A (forward 70/30),DBSCAN,0.024,0.106,0.039,,0.12,0.000
+GB Demand (NESO real),A (forward 70/30),Rolling Z-score,0.012,0.052,0.019,,0.06,0.000
+GB Demand (NESO real),B (clean window),LSTM Autoencoder,0.239,0.345,0.282,0.39,0.00,0.000
+GB Demand (NESO real),B (clean window),Transformer Encoder,0.120,0.174,0.142,0.19,0.00,0.011
+GB Demand (NESO real),B (clean window),Isolation Forest,0.094,0.135,0.111,0.15,0.00,0.018
+GB Demand (NESO real),B (clean window),DBSCAN,0.057,0.085,0.068,0.09,0.09,0.012
+GB Demand (NESO real),B (clean window),Rolling Z-score,0.023,0.033,0.027,0.03,0.05,0.012

@@ -1,0 +1,16 @@
+Dataset,Protocol,Method,Precision,Recall,F1
+FR Load,A (forward 70/30),LSTM Autoencoder,0.092,0.045,0.060
+FR Load,A (forward 70/30),Transformer Encoder,0.141,0.068,0.092
+FR Load,A (forward 70/30),Isolation Forest,0.044,0.022,0.029
+FR Load,A (forward 70/30),DBSCAN,0.203,0.244,0.222
+FR Load,A (forward 70/30),Rolling Z-score,0.084,0.041,0.055
+FR Load,B (clean window),LSTM Autoencoder,0.202,0.067,0.101
+FR Load,B (clean window),Transformer Encoder,0.102,0.034,0.051
+FR Load,B (clean window),Isolation Forest,0.155,0.051,0.077
+FR Load,B (clean window),DBSCAN,0.332,0.139,0.196
+FR Load,B (clean window),Rolling Z-score,0.150,0.050,0.075
+FR Line Flow,B (clean window),LSTM Autoencoder,0.713,0.286,0.408
+FR Line Flow,B (clean window),Transformer Encoder,0.713,0.286,0.408
+FR Line Flow,B (clean window),Isolation Forest,0.179,0.072,0.103
+FR Line Flow,B (clean window),DBSCAN,0.246,0.106,0.148
+FR Line Flow,B (clean window),Rolling Z-score,0.141,0.057,0.081

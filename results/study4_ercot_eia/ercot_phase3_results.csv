@@ -1,0 +1,11 @@
+Dataset,Protocol,Method,Precision,Recall,F1,Recall_TexasFreeze,Recall_Elliott,FP_share_Jul22_heat
+ERCOT Demand (EIA real),A (forward 70/30),LSTM Autoencoder,0.000,0.000,0.000,,0.00,0.000
+ERCOT Demand (EIA real),A (forward 70/30),Transformer Encoder,0.000,0.000,0.000,,0.00,0.000
+ERCOT Demand (EIA real),A (forward 70/30),Isolation Forest,0.000,0.000,0.000,,0.00,0.143
+ERCOT Demand (EIA real),A (forward 70/30),DBSCAN,0.058,0.281,0.097,,0.34,0.000
+ERCOT Demand (EIA real),A (forward 70/30),Rolling Z-score,0.006,0.033,0.010,,0.03,0.063
+ERCOT Demand (EIA real),B (clean window),LSTM Autoencoder,0.000,0.000,0.000,0.00,0.00,0.000
+ERCOT Demand (EIA real),B (clean window),Transformer Encoder,0.000,0.000,0.000,0.00,0.00,0.000
+ERCOT Demand (EIA real),B (clean window),Isolation Forest,0.000,0.000,0.000,0.00,0.00,0.055
+ERCOT Demand (EIA real),B (clean window),DBSCAN,0.029,0.135,0.047,0.07,0.26,0.000
+ERCOT Demand (EIA real),B (clean window),Rolling Z-score,0.001,0.008,0.002,0.01,0.00,0.018

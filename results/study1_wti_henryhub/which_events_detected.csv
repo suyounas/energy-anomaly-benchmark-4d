@@ -1,0 +1,21 @@
+Commodity,Method,Event,Detected,First_Flagged_Date,Lag_Days_From_Event_Start
+WTI,LSTM Autoencoder,Texas Freeze 2021,No,,
+WTI,LSTM Autoencoder,Russia-Ukraine 2022,Yes,2022-03-11,19
+WTI,Transformer Encoder,Texas Freeze 2021,No,,
+WTI,Transformer Encoder,Russia-Ukraine 2022,Yes,2022-03-09,17
+WTI,Isolation Forest,Texas Freeze 2021,No,,
+WTI,Isolation Forest,Russia-Ukraine 2022,Yes,2022-03-02,10
+WTI,DBSCAN,Texas Freeze 2021,Yes,2021-02-18,8
+WTI,DBSCAN,Russia-Ukraine 2022,Yes,2022-03-01,9
+WTI,Rolling Z-score,Texas Freeze 2021,No,,
+WTI,Rolling Z-score,Russia-Ukraine 2022,Yes,2022-03-01,9
+Henry Hub,LSTM Autoencoder,Texas Freeze 2021,Yes,2021-03-04,22
+Henry Hub,LSTM Autoencoder,Russia-Ukraine 2022,No,,
+Henry Hub,Transformer Encoder,Texas Freeze 2021,No,,
+Henry Hub,Transformer Encoder,Russia-Ukraine 2022,No,,
+Henry Hub,Isolation Forest,Texas Freeze 2021,Yes,2021-02-11,1
+Henry Hub,Isolation Forest,Russia-Ukraine 2022,Yes,2022-05-10,79
+Henry Hub,DBSCAN,Texas Freeze 2021,Yes,2021-02-05,-5
+Henry Hub,DBSCAN,Russia-Ukraine 2022,Yes,2022-03-02,10
+Henry Hub,Rolling Z-score,Texas Freeze 2021,Yes,2021-02-05,-5
+Henry Hub,Rolling Z-score,Russia-Ukraine 2022,No,,
