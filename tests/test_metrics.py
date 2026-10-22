@@ -53,19 +53,13 @@ def test_per_event_recall_is_none_when_event_absent_from_test_data():
 def test_per_event_recall_half_flagged():
     dates = half_hourly("2022-12-01", "2022-12-31")
     flag = np.zeros(len(dates), int)
-    mask = ((dates >= "2022-12-08") & (dates <= "2022-12-17")).values
+    mask = ((dates >= "2022-12-08") & (dates < "2022-12-18")).values   # whole end day included
     idx = np.flatnonzero(mask)
     flag[idx[: len(idx) // 2]] = 1
     r = per_event_recall(dates, np.zeros(len(dates), int), flag)
     assert r["Cold snap spike"] == pytest.approx(0.5, abs=0.01)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="KNOWN INCONSISTENCY: labelling treats an event's end date as inclusive of "
-           "the whole day (Date <= end + 1 day), but per_event_recall compares against "
-           "the end date at 00:00, so the final day of each event is excluded from the "
-           "recall denominator. Effect is about 1 day in 10 (cold snap) or 1 in 70 (COVID).")
 def test_event_end_date_is_inclusive_of_whole_day():
     dates = half_hourly("2022-12-17", "2022-12-18")
     flag = np.ones(len(dates), int)

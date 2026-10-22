@@ -217,7 +217,7 @@ def flag_from_scores(scores, pct=95):
 def per_event_recall(dates, flag):
     out = {}
     for start, end, name in GROUND_TRUTH_EVENTS:
-        mask = (dates >= start) & (dates <= end)
+        mask = (dates >= start) & (dates < pd.Timestamp(end) + pd.Timedelta(days=1))  # whole end day is inside the event
         out[name] = flag[mask].mean() if mask.sum() else None
     return out
 
