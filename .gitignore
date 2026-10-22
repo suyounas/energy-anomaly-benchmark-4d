@@ -13,3 +13,13 @@ __pycache__/
 # Editor
 .vscode/
 *.swp
+
+# LaTeX build artefacts / caches
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.toc
+__pycache__/
+.pytest_cache/

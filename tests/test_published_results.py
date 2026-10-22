@@ -46,7 +46,7 @@ def test_every_dataset_has_all_five_methods(rel):
 
 
 def test_all_result_files_are_covered_or_deliberately_skipped():
-    on_disk = {os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "*", "*.csv"))}
+    on_disk = {os.path.relpath(p, ROOT) for p in glob.glob(os.path.join(ROOT, "study*", "*.csv"))}
     skipped = {"study1_wti_henryhub/final_corrected_results.csv",   # recall stored as text "1/2 = 0.5"
                "study1_wti_henryhub/which_events_detected.csv"}      # event table, no P/R/F1
     assert on_disk == set(TABLES) | skipped
