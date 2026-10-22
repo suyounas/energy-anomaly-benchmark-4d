@@ -1,0 +1,141 @@
+{
+ "WTI spot (FRED)|Texas Freeze|days": 16,
+ "WTI spot (FRED)|Russia--Ukraine|days": 131,
+ "Henry Hub (FRED)|Texas Freeze|days": 16,
+ "Henry Hub (FRED)|Russia--Ukraine|days": 131,
+ "FR load (Gillioz)|Nuclear crisis|days": 110,
+ "FR load (Gillioz)|Nuclear crisis|samples": 2640,
+ "FR load (Gillioz)|COVID-19|days": 57,
+ "FR load (Gillioz)|COVID-19|samples": 1368,
+ "FR line flow (Gillioz)|Nuclear crisis|days": 110,
+ "FR line flow (Gillioz)|Nuclear crisis|samples": 2640,
+ "GB demand (NESO)|COVID-19|days": 70,
+ "GB demand (NESO)|COVID-19|samples": 3360,
+ "GB demand (NESO)|Cold snap|days": 10,
+ "GB demand (NESO)|Cold snap|samples": 480,
+ "ERCOT demand (EIA-930)|Texas Freeze|days": 6,
+ "ERCOT demand (EIA-930)|Texas Freeze|samples": 144,
+ "ERCOT demand (EIA-930)|Elliott|days": 5,
+ "ERCOT demand (EIA-930)|Elliott|samples": 120,
+ "wti_dbscan_submitted_hybrid_f1": 0.695,
+ "wti_dbscan_consistent_f1": 0.344,
+ "wti_lstm_consistent_f1": 0.59,
+ "gb_B_lstm_f1": 0.282,
+ "dbscan_f1_by_dataset": {
+  "WTI|forward": 0.344,
+  "Henry Hub|forward": 0.304,
+  "FR Load|A": 0.222,
+  "FR Load|B": 0.196,
+  "FR Line Flow|B": 0.148,
+  "GB demand|A": 0.039,
+  "GB demand|B": 0.068,
+  "ERCOT demand|A": 0.097,
+  "ERCOT demand|B": 0.047
+ },
+ "shift|prevalence_range": [
+  0.0299274082211302,
+  0.0317389626198747
+ ],
+ "shift|dbscan_alert_rate_cell_range": [
+  0.1132,
+  0.2425
+ ],
+ "shift|corr_dbscan_f1_alert_rate": -0.9168952060532768,
+ "shift|dbscan_f1_30min_vs_1h_max_abs_diff": 0.02070000000000005,
+ "shift|dbscan_f1_range": [
+  0.2181,
+  0.4193
+ ],
+ "shift|z_rolling_alert_rate_max": 0.0199,
+ "shift|tie|2h": false,
+ "shift|tie|12h": false,
+ "shift|tie|1d": false,
+ "shift|tie|3d": false,
+ "shift|tie|7d": false,
+ "shift|tie|14d": true,
+ "shift|best_by_duration_30min": {
+  "2h": "z_rolling",
+  "12h": "z_rolling",
+  "1d": "z_rolling",
+  "3d": "isolation_forest",
+  "7d": "isolation_forest",
+  "14d": "isolation_forest"
+ },
+ "shift|z_rolling_1d_res": [
+  {
+   "duration": "14d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.085
+  },
+  {
+   "duration": "1d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.969
+  },
+  {
+   "duration": "3d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.384
+  },
+  {
+   "duration": "7d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.108
+  }
+ ],
+ "shift|n_runs": 960,
+ "shift|n_seeds": 10,
+ "burst|prevalence_range": [
+  0.0299274082211302,
+  0.0317092722900151
+ ],
+ "burst|dbscan_alert_rate_cell_range": [
+  0.0863,
+  0.214
+ ],
+ "burst|corr_dbscan_f1_alert_rate": 0.09637756204841764,
+ "burst|dbscan_f1_30min_vs_1h_max_abs_diff": 0.02169999999999997,
+ "burst|dbscan_f1_range": [
+  0.1152,
+  0.4025
+ ],
+ "burst|z_rolling_alert_rate_max": 0.0103,
+ "burst|tie|2h": false,
+ "burst|tie|12h": false,
+ "burst|tie|1d": false,
+ "burst|tie|3d": true,
+ "burst|tie|7d": true,
+ "burst|tie|14d": true,
+ "burst|best_by_duration_30min": {
+  "2h": "z_published",
+  "12h": "z_published",
+  "1d": "z_published",
+  "3d": "z_published",
+  "7d": "pca_window_recon",
+  "14d": "pca_window_recon"
+ },
+ "burst|z_rolling_1d_res": [
+  {
+   "duration": "14d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.047
+  },
+  {
+   "duration": "1d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.084
+  },
+  {
+   "duration": "3d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.072
+  },
+  {
+   "duration": "7d",
+   "ts_f1_mean": 0.0,
+   "auc_pr_mean": 0.055
+  }
+ ],
+ "burst|n_runs": 960,
+ "burst|n_seeds": 10
+}

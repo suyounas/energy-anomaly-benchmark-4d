@@ -193,3 +193,6 @@ tier sufficient) for PyTorch and unrestricted data download access.
 ## Author
 
 Sulman Younas Physics PhD (CERN ATLAS) [github.com/suyounas](https://github.com/suyounas) [medium.com/@sulmanyounas93](https://medium.com/@sulmanyounas93)
+
+## Revision
+See `docs/REVISION_LOG.md` and `paper/revised/` (revised manuscript; tables are generated from the CSVs by `make_tables.py`). The shared evaluation code is in `ebench/`; controlled experiments are in `experiments/`.
