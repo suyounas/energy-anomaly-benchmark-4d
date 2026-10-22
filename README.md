@@ -8,9 +8,12 @@ real commodity price time-series (WTI crude oil, Henry Hub natural gas).
 multi-node power grid data (national demand and cross-border transmission
 line flows), testing whether it generalises beyond univariate series.
 
-**Status:** working repository, actively developed. Not yet submitted to
-arXiv or a conference/workshop. Kept private while still being corrected
-and extended.
+**Status (22 Oct 2026):** public, under revision. An earlier four-page version
+was submitted to IEEE BigData 2026 (BigD340) and rejected. The revised
+evaluation, tests and run-book are in `docs/REVISION_LOG.md`, the shared
+evaluation code in `ebench/`, and the revised manuscript in `paper/revised/`.
+The older markdown sections in `paper/` are the pre-review draft and are
+superseded where `paper/README.md` says so.
 
 ---
 
@@ -83,7 +86,8 @@ for the full accounts.
    in final states with jets in pp collisions at s = 13 TeV with the
    ATLAS detector.* Phys. Rev. D 108, 052009 (2023).
    [arXiv:2306.03637](https://arxiv.org/abs/2306.03637) the original
-   model-independent anomaly detection methodology this work adapts.
+   model-independent anomaly detection methodology that motivated this work (no
+   statistical machinery from it is reused here).
 2. **Howe, A.** *Innovation & Analytics Lab at Wood Mackenzie.* Medium
    (2024). [Link](https://medium.com/@ahowe42/innovation-analytics-lab-data-science-8c2d79deca79)
    the applied commodity-analytics work that motivated this line of
@@ -122,8 +126,10 @@ References section.
   method ranking **inverts twice**. DBSCAN's three-dataset consistency
   does NOT extend to real grid demand (GB F1 0.068 vs LSTM 0.282), and
   inverts again on ERCOT where DBSCAN is the only scoring method while
-  deep models score zero — 94% of the LSTM's ERCOT flags land on the
-  *unlabelled* record summer of 2023. Each inversion is mechanistically
+  deep models score zero — an earlier diagnostic reported that most of the
+  LSTM's ERCOT flags land on the *unlabelled* record summer of 2023 (that
+  diagnostic script is not in this repository and is being re-run; see
+  `docs/REVISION_LOG.md`). Each inversion is mechanistically
   diagnosed (event duration × sampling resolution; seasonal amplitude
   asymmetry; label completeness), not just reported. See
   `paper/section11_four_dataset_synthesis.md`.
