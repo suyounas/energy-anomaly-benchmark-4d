@@ -1,0 +1,12 @@
+\begin{tabular}{llcllcc}
+\toprule
+Duration & Best (AUC-PR) & AUC-PR & 2nd best & AUC-PR & DBSCAN AUC-PR & DBSCAN alert rate \\
+\midrule
+2h & $|$return$|$ top-5\% & 0.81$\pm$0.01 & kNN-to-train & 0.76$\pm$0.01 & 0.17 & 16\% \\
+12h & $|$return$|$ top-5\% & 0.93$\pm$0.00 & kNN-to-train & 0.79$\pm$0.01 & 0.14 & 21\% \\
+1d & $|$return$|$ top-5\% & 0.94$\pm$0.00 & IForest & 0.83$\pm$0.03 & 0.15 & 19\% \\
+3d$^\dagger$ & $|$return$|$ top-5\% & 0.95$\pm$0.00 & IForest & 0.94$\pm$0.01 & 0.20 & 15\% \\
+7d$^\dagger$ & PCA window recon. & 0.98$\pm$0.01 & IForest & 0.97$\pm$0.01 & 0.22 & 13\% \\
+14d$^\dagger$ & PCA window recon. & 0.99$\pm$0.01 & IForest & 0.98$\pm$0.01 & 0.25 & 12\% \\
+\bottomrule
+\end{tabular}
