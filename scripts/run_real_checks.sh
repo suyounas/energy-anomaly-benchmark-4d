@@ -9,6 +9,7 @@
 # A step whose input file is missing is SKIPPED with a message, not treated as a pass.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+PY=${PY:-python3}
 
 GB_CSV=${GB_CSV:-neso_demand_full.csv}
 ERCOT_CSV=${ERCOT_CSV:-ercot_demand_full.csv}
@@ -49,20 +50,20 @@ GB_TRAIN=(--train-window 2018-06-01 2020-02-01)
 ER_EVENTS=(--event 2021-02-14 2021-02-19 "Texas Freeze" --event 2022-12-22 2022-12-26 "Elliott spike")
 ER_TRAIN=(--train-window 2021-06-01 2022-06-01)
 
-step tests "" python -m pytest -q
-step ablation_gb "$GB_CSV" python experiments/real_resolution_ablation.py --csv "$GB_CSV" \
+step tests "" "$PY" -m pytest -q
+step ablation_gb "$GB_CSV" "$PY" experiments/real_resolution_ablation.py --csv "$GB_CSV" \
   --time-col Datetime --value-col ND_MW --base-minutes 30 "${GB_EVENTS[@]}" "${GB_TRAIN[@]}" \
   --factors 1 2 48 --out "$OUT/gb_resolution_ablation.csv"
-step ablation_ercot "$ERCOT_CSV" python experiments/real_resolution_ablation.py --csv "$ERCOT_CSV" \
+step ablation_ercot "$ERCOT_CSV" "$PY" experiments/real_resolution_ablation.py --csv "$ERCOT_CSV" \
   --time-col Datetime --value-col Demand_MW --base-minutes 60 "${ER_EVENTS[@]}" "${ER_TRAIN[@]}" \
   --factors 1 24 --out "$OUT/ercot_resolution_ablation.csv"
-step tuning_gb "$GB_CSV" python experiments/equal_budget_tuning.py --csv "$GB_CSV" \
+step tuning_gb "$GB_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$GB_CSV" \
   --time-col Datetime --value-col ND_MW --base-minutes 30 --factor 2 "${GB_EVENTS[@]}" "${GB_TRAIN[@]}" \
   --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --out "$OUT/gb_equal_budget"
-step tuning_ercot "$ERCOT_CSV" python experiments/equal_budget_tuning.py --csv "$ERCOT_CSV" \
+step tuning_ercot "$ERCOT_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$ERCOT_CSV" \
   --time-col Datetime --value-col Demand_MW --base-minutes 60 --factor 1 "${ER_EVENTS[@]}" "${ER_TRAIN[@]}" \
   --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --out "$OUT/ercot_equal_budget"
-step tiers "$ERCOT_FLAGS" python experiments/ercot_label_tiers.py --flags "$ERCOT_FLAGS" \
+step tiers "$ERCOT_FLAGS" "$PY" experiments/ercot_label_tiers.py --flags "$ERCOT_FLAGS" \
   --out "$OUT/ercot_tiers.csv"
 
 echo; echo "== summary =="
