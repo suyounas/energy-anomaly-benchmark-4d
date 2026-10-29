@@ -10,7 +10,7 @@ Status of each item in the 18-row issue register. **Done** = implemented and tes
 | 2 | "Detection gap" contradicted by GB 0.282 / FR line flow 0.408 (R3-3) | Done | Claim withdrawn. |
 | 3 | FR line flow missing from Fig. 4 (R3-3) | Done | Fig. 4 removed with the claim; line flow is in the datasets table and results table. |
 | 4 | DBSCAN not monotone (R3-2) | Done | Claim withdrawn; controlled sweep shows a U-shape in duration and ≤0.022 change from 30 min to 1 h. |
-| 5 | ERCOT unlabelled summer 2023 (R3-4) | Partial | Tiered-label design in paper (Tier 1 pre-specified; Tier 2 = documented ERCOT records 27 Jun–10 Aug 2023, post hoc). **To run:** the 94% diagnostic is not in the repo; add it and recompute ERCOT under Tier 1 and Tier 1+2. |
+| 5 | ERCOT unlabelled summer 2023 (R3-4) | Partial | Tiered-label design in paper (Tier 1 pre-specified; Tier 2 = documented ERCOT records 27 Jun–10 Aug 2023, post hoc). Diagnostic now in `experiments/ercot_label_tiers.py` (tested). **To run:** regenerate `ercot_flags.csv` with the patched Study 4 pipeline, then `bash scripts/run_real_checks.sh --only tiers` (see `docs/RUNBOOK_REAL_DATA.md`). |
 | 6 | Durations table, synthetic flag (R3-5) | Done | Table 1 gives dates, days, native samples, real/synthetic. |
 | 7 | Confounded variables (W2.2) | Partial | Synthetic constant-prevalence sweep (2 event types × 3 resolutions × 6 durations × 10 seeds) done. **To run:** `experiments/real_resolution_ablation.py` on GB and ERCOT. |
 | 8 | Only 5 events / 1–2 per dataset (W2.3, W3.1) | Open | Real tables are explicitly descriptive. Adding documented events is future work. |
@@ -33,8 +33,10 @@ Status of each item in the 18-row issue register. **Done** = implemented and tes
 * `inject_events` produced NaN events when called on a sub-array (scale from an empty slice) and the tuning loop silently fell back to defaults; both fixed with regression tests.
 
 ## How to reproduce / what you need to run
+One-command version for the real-data steps: `bash scripts/run_real_checks.sh` (see `docs/RUNBOOK_REAL_DATA.md`).
+
 ```bash
-pip install -r requirements-test.txt && pytest -q          # 53 tests
+pip install -r requirements-test.txt && pytest -q          # 61 tests
 python experiments/synthetic_sweep.py --seeds 10 --kind shift --out results/synthetic/sweep_shift_mag3.csv
 python experiments/synthetic_sweep.py --seeds 10 --kind burst --out results/synthetic/sweep_burst_mag3.csv
 python experiments/analyse_sweep.py results/synthetic/sweep_shift_mag3.csv --tag shift
