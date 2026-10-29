@@ -23,3 +23,7 @@ __pycache__/
 *.toc
 __pycache__/
 .pytest_cache/
+
+# local drafts and patch bundles
+energy-anomaly-benchmark-4d_draft.pdf
+revision_patches_v2/
