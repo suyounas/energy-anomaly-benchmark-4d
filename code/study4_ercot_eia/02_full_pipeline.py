@@ -53,6 +53,7 @@ GROUND_TRUTH_EVENTS = [
     ("2022-12-22", "2022-12-26", "Elliott spike"),
 ]
 UNLABELLED_WINDOW = ("2022-07-10", "2022-07-25")  # record summer heat
+FLAG_ROWS = []  # per-timestamp flags, written to ercot_flags.csv for experiments/ercot_label_tiers.py
 
 # ═══════════════════════════════════════════════════════════════════════
 # %% PHASE 2 — features, labels, splits
@@ -264,6 +265,10 @@ def run_pipeline(train_df, test_df, label):
                             for k, v in ev.items())
         print(f'  {name:<22} P={p:.3f} R={r:.3f} F1={f1:.3f} | {ev_str} | '
               f'FPs in Jul-22 heat: {share:.1%} of {n_fp}')
+        FLAG_ROWS.append(pd.DataFrame({'protocol': label.split(' — ')[1].split(' ')[1],
+                                       'detector': name, 'time': pd.to_datetime(dates),
+                                       'flag': np.asarray(flag).astype(int),
+                                       'y_tier1': np.asarray(y).astype(int)}))
         rows.append({'Method': name, 'Precision': round(p,3), 'Recall': round(r,3),
                      'F1': round(f1,3),
                      **{f'Recall_{k}': (round(v,3) if v is not None else None)
@@ -283,6 +288,7 @@ for r in rows_B:
     out.append({'Dataset': 'ERCOT Demand (EIA, real)', 'Protocol': 'B (clean window)', **r})
 final = pd.DataFrame(out)
 final.to_csv('ercot_phase3_results.csv', index=False)
+pd.concat(FLAG_ROWS, ignore_index=True).to_csv('ercot_flags.csv', index=False)
 print('\n' + '=' * 70)
 print('FINAL — saved ercot_phase3_results.csv')
 print('=' * 70)
