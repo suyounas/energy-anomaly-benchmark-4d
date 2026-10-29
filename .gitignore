@@ -27,3 +27,11 @@ __pycache__/
 # local drafts and patch bundles
 energy-anomaly-benchmark-4d_draft.pdf
 revision_patches_v2/
+
+# local real-data inputs/outputs
+neso_demand_full.csv
+ercot_demand_full.csv
+ercot_flags.csv
+results/
+results_run1.txt
+*.numbers
