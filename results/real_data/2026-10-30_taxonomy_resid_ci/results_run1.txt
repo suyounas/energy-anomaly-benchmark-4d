@@ -1,0 +1,100 @@
+[RUN ] tests
+       python3 -m pytest -q
+.............................................................            [100%]
+=============================== warnings summary ===============================
+tests/test_synthetic_and_tuning.py::test_injection_on_subarray_needs_finite_scale_regression
+  /Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/numpy/_core/_methods.py:218: RuntimeWarning: Degrees of freedom <= 0 for slice
+    ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+
+tests/test_synthetic_and_tuning.py::test_injection_on_subarray_needs_finite_scale_regression
+  /Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/numpy/_core/_methods.py:175: RuntimeWarning: invalid value encountered in divide
+    arrmean = um.true_divide(arrmean, div, out=arrmean,
+
+tests/test_synthetic_and_tuning.py::test_injection_on_subarray_needs_finite_scale_regression
+  /Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/numpy/_core/_methods.py:210: RuntimeWarning: invalid value encountered in scalar divide
+    ret = ret.dtype.type(ret / rcount)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+61 passed, 3 warnings in 2.65s
+[RUN ] ablation_gb
+       python3 experiments/real_resolution_ablation.py --csv neso_demand_full.csv --time-col Datetime --value-col ND_MW --base-minutes 30 --event 2020-03-23 2020-05-31 COVID --event 2022-12-08 2022-12-17 ColdSnap --train-window 2018-06-01 2020-02-01 --factors 1 2 48 --out results/real/gb_resolution_ablation.csv
+factor 1: n_train=29278 n_test=110914 prevalence=0.035
+factor 2: n_train=14639 n_test=55457 prevalence=0.035
+factor 48: n_train=610 n_test=2308 prevalence=0.035
+    factor          detector  alert_rate  ts_f1  f1_ceiling  auc_pr_lift  ev_f1
+0        1  isolation_forest       0.050  0.111       0.819        2.243  0.151
+1        1  dbscan_published       0.051  0.068       0.805        1.055  0.105
+2        1     knn_inductive       0.050  0.002       0.818        1.666  0.061
+3        1       z_published       0.050  0.027       0.818        0.935  0.057
+4        1         z_rolling       0.000  0.000       0.000        1.004  0.000
+5        2  isolation_forest       0.050  0.070       0.818        1.622  0.128
+6        2  dbscan_published       0.046  0.072       0.864        1.071  0.120
+7        2     knn_inductive       0.050  0.002       0.818        1.571  0.088
+8        2       z_published       0.050  0.020       0.818        0.921  0.048
+9        2         z_rolling       0.000  0.000       0.000        1.006  0.000
+10      48  isolation_forest       0.050  0.010       0.816        1.538  0.025
+11      48  dbscan_published       0.017  0.083       0.667        1.163  0.190
+12      48     knn_inductive       0.050  0.031       0.816        2.070  0.111
+13      48       z_published       0.050  0.010       0.816        0.939  0.033
+14      48         z_rolling       0.000  0.000       0.025        1.310  0.000
+[RUN ] ablation_ercot
+       python3 experiments/real_resolution_ablation.py --csv ercot_demand_full.csv --time-col Datetime --value-col Demand_MW --base-minutes 60 --event 2021-02-14 2021-02-19 Texas Freeze --event 2022-12-22 2022-12-26 Elliott spike --train-window 2021-06-01 2022-06-01 --factors 1 24 --out results/real/ercot_resolution_ablation.csv
+factor 1: n_train=8760 n_test=35040 prevalence=0.008
+factor 24: n_train=365 n_test=1458 prevalence=0.008
+   factor          detector  alert_rate  ts_f1  f1_ceiling  auc_pr_lift  ev_f1
+0       1  isolation_forest       0.050  0.000       0.262        0.644  0.000
+1       1  dbscan_published       0.036  0.047       0.347        1.381  0.049
+2       1     knn_inductive       0.050  0.001       0.262        0.776  0.040
+3       1       z_published       0.050  0.002       0.262        1.177  0.006
+4       1         z_rolling       0.007  0.183       0.996       16.623  0.179
+5      24  isolation_forest       0.050  0.119       0.262       13.397  0.143
+6      24  dbscan_published       0.018  0.162       0.595        4.898  0.222
+7      24     knn_inductive       0.050  0.048       0.262       13.232  0.273
+8      24       z_published       0.050  0.143       0.262       12.398  0.111
+9      24         z_rolling       0.012  0.143       0.786       26.981  0.143
+[RUN ] tuning_gb
+       python3 experiments/equal_budget_tuning.py --csv neso_demand_full.csv --time-col Datetime --value-col ND_MW --base-minutes 30 --factor 2 --event 2020-03-23 2020-05-31 COVID --event 2022-12-08 2022-12-17 ColdSnap --train-window 2018-06-01 2020-02-01 --families isolation_forest knn_inductive rolling_z --n-trials 8 --n-seeds 5 --out results/real/gb_equal_budget
+fit rows 10200, validation rows 4415, validation prevalence 0.132
+                    min    max
+family                        
+isolation_forest  0.406  0.456
+knn_inductive     0.165  0.167
+rolling_z         0.184  0.267
+common evaluation rows: 55457 / 55457
+                         auc_pr         ts_f1  ... cov_COVID cov_ColdSnap     
+                           mean    std   mean  ...       std         mean  std
+family           config                        ...                            
+isolation_forest default  0.055  0.007  0.058  ...     0.035        0.000  0.0
+                 tuned    0.062  0.005  0.098  ...     0.031        0.000  0.0
+knn_inductive    default  0.054  0.000  0.002  ...     0.000        0.000  0.0
+                 tuned    0.054  0.000  0.002  ...     0.000        0.000  0.0
+rolling_z        default  0.035  0.000  0.026  ...     0.000        0.050  0.0
+                 tuned    0.034  0.000  0.025  ...     0.000        0.042  0.0
+
+[6 rows x 10 columns]
+[RUN ] tuning_ercot
+       python3 experiments/equal_budget_tuning.py --csv ercot_demand_full.csv --time-col Datetime --value-col Demand_MW --base-minutes 60 --factor 1 --event 2021-02-14 2021-02-19 Texas Freeze --event 2022-12-22 2022-12-26 Elliott spike --train-window 2021-06-01 2022-06-01 --families isolation_forest knn_inductive rolling_z --n-trials 8 --n-seeds 5 --out results/real/ercot_equal_budget
+fit rows 6072, validation rows 2664, validation prevalence 0.216
+                    min    max
+family                        
+isolation_forest  0.427  0.566
+knn_inductive     0.270  0.270
+rolling_z         0.255  0.371
+common evaluation rows: 35040 / 35040
+                         auc_pr       ts_f1  ... cov_Texas Freeze cov_Elliott spike     
+                           mean  std   mean  ...              std              mean  std
+family           config                      ...                                        
+isolation_forest default  0.005  0.0  0.000  ...            0.004             0.000  0.0
+                 tuned    0.006  0.0  0.001  ...            0.000             0.000  0.0
+knn_inductive    default  0.006  0.0  0.001  ...            0.000             0.000  0.0
+                 tuned    0.006  0.0  0.001  ...            0.000             0.000  0.0
+rolling_z        default  0.011  0.0  0.024  ...            0.000             0.117  0.0
+                 tuned    0.010  0.0  0.016  ...            0.000             0.100  0.0
+
+[6 rows x 10 columns]
+[SKIP] tiers: missing input ercot_flags.csv
+
+== summary ==
+ran:     tests ablation_gb ablation_ercot tuning_gb tuning_ercot
+skipped: tiers
+failed:  none
