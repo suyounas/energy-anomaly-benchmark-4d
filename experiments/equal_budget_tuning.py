@@ -55,7 +55,12 @@ def main(a):
                                          n_trials=a.n_trials, seed=a.seed, spd=spd)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     trials.to_csv(a.out + "_trials.csv", index=False)
-    print(trials.groupby("family").val_auc_pr.agg(["min", "max"]).round(3))
+    print(trials.groupby("family").agg(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max"),
+                                       val_lift_max=("val_lift", "max"), informative=("informative", "first")).round(3))
+    for fam_name, ok in trials.groupby("family").informative.first().items():
+        if not ok:
+            print(f"NOTE {fam_name}: validation cannot separate its configs (spread < 0.02); "
+                  f"the default config is used, 'tuned' == 'default' for this family")
 
     # --- final evaluation on real data, identical rows for every detector
     F = build_features(t, x, spd, a.window_days)

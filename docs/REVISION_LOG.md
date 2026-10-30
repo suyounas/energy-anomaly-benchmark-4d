@@ -53,3 +53,9 @@ python experiments/equal_budget_tuning.py --csv neso_demand_full.csv --time-col 
   --families isolation_forest knn_inductive rolling_z lstm_ae transformer --out results/real/gb_equal_budget
 ```
 Note: on the real data the `ebench` features are re-derived (return, rolling mean/std/skew over a time-fixed window), so they will not reproduce the published tables exactly.
+
+## Real-data runs, 29 Oct 2026 (outputs in `results/real_data/`, summary in `docs/real_data_summary.md`)
+* Resolution is a real confound on real data (ERCOT Isolation Forest F1 0.000 hourly vs 0.119 daily); the synthetic bound (<= 0.022) does not carry over.
+* ERCOT Tier 1: neural detectors F1 = 0 under both protocols; their flags are 93-100% in Jul-Sep 2023. Tier 1+2 F1 0.43 (B) comes only from the post-hoc Tier 2 label.
+* Validation on injected events is uninformative for kNN, LSTM-AE and Transformer (validation AUC-PR ~ prevalence for every config). `equal_budget_search` now keeps the default config in that case (`min_spread`), so "tuned" is not selection on noise. Existing runs predate this rule.
+* `z_rolling` (z > 3) fires on 0-1% of real data; `z_rolling_top5` gives it the 5% budget of the other detectors.
