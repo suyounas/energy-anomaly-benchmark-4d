@@ -36,5 +36,24 @@ picture: every family has lift ~ 1 on shift cells.
 * kNN is nearly insensitive to `k` (the ranking by k-th neighbour distance barely changes between k = 3 and 50 when
   the training set is dense); on a stand-in series its validation macro lift varies by < 0.01 across k, matching the real runs.
   That is a property of the detector, not a bug, and the gate keeps the default for it.
-* Open question: adding the raw level as a feature would make level shifts visible. That is a
-  feature-set ablation, separate from the published recipe, and is not run by default.
+
+## Real-data check of the level-blindness hypothesis (30 Oct 2026, taxonomy suite, `recipe` features)
+Default-config validation lift (1 = chance), GB (1 h) / ERCOT (hourly):
+
+| family | shift (GB 1/3/7 d) | burst (GB 1/3/7 d) | pulse |
+|---|---|---|---|
+| Isolation Forest | 0.66 / 0.59 / 0.59 | 7.9 / 10.8 / 6.0 | 1.2 |
+| kNN | 0.75 / 0.80 / 0.65 | 3.2 / 6.3 / 6.5 | 0.7 |
+| rolling z | 1.7 / 1.7 / 1.1 | 8.4 / 9.5 / 2.8 | 31.8 |
+
+Level shifts score at or *below* chance for Isolation Forest and kNN (ERCOT the same pattern), while bursts are found. The
+real test events (COVID, the Freeze, the cold snap) are mostly level-shift or ramp events, so the recipe is largely blind to
+the event type the benchmark is about. This is a statement about the 4-feature recipe, not about the detectors.
+
+## Feature ablation: `--features resid`
+Adds one causal feature: value minus the median of the same time of the week over the previous 4 weeks (seasonal-naive
+residual), scaled by a robust spread. It uses only past values, needs no fitting, and is 0 on a pure weekly pattern.
+Choose between `recipe` and `resid` **on validation lift only**, before looking at test events. On a stand-in series
+Isolation Forest's shift lift goes from ~1 to 6-11; kNN barely changes (a 3-sd residual is not far from its training
+neighbours in 5-D), which is a property of kNN, not a bug. `FEATURES=resid` in `scripts/run_real_checks.sh`; outputs get a
+`_resid` suffix. The published tables stay on `recipe`.
