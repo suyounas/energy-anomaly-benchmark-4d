@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from ebench import timestamp_level_prf, event_level_prf, per_event_coverage, auc_pr, event_mask
 from ebench.synthetic import resample
 from ebench.detectors import top_pct_flag
-from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series
+from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series, make_validation_suite
 from real_resolution_ablation import build_features, FEATS
 
 
@@ -39,10 +39,20 @@ def main(a):
     # --- validation with synthetic events: inject on the NATIVE grid inside the clean training
     #     window (last 30% only), then resample the window, so durations stay in days at any factor
     m0 = (t0 >= lo) & (t0 < hi)
-    n_fit_native = int(0.7 * m0.sum()); n_fit_native -= n_fit_native % 48
-    x_inj_nat, y_inj_nat = inject_into_series(t0[m0], x0[m0], n_fit_native, a.val_durations,
-                                              a.val_prevalence, a.val_magnitude, a.seed,
-                                              base_minutes=a.base_minutes)
+    legacy = a.val_suite == "legacy"
+    frac = 0.7 if legacy else 1.0 - a.val_frac
+    n_fit_native = int(frac * m0.sum()); n_fit_native -= n_fit_native % 48
+    cells_all = None
+    if legacy:
+        x_inj_nat, y_inj_nat = inject_into_series(t0[m0], x0[m0], n_fit_native, a.val_durations,
+                                                  a.val_prevalence, a.val_magnitude, a.seed,
+                                                  base_minutes=a.base_minutes)
+    else:
+        x_inj_nat, cell_nat, cell_tbl = make_validation_suite(
+            t0[m0], x0[m0], n_fit_native, base_minutes=a.base_minutes,
+            durations_days=tuple(a.suite_durations), magnitudes=tuple(a.suite_magnitudes),
+            days_per_cell=a.suite_days_per_cell, seed=a.seed)
+        y_inj_nat = (cell_nat >= 0).astype(int)
     t_w, x_inj, y_inj = resample(t0[m0], x_inj_nat, y_inj_nat, a.factor)
     F_inj = build_features(t_w, x_inj, spd, a.window_days)
     y_all = pd.Series(y_inj, index=t_w).reindex(F_inj.index).fillna(0).to_numpy().astype(int)
@@ -50,17 +60,41 @@ def main(a):
     Ffit, Fval = F_inj[F_inj.index < split_t], F_inj[F_inj.index >= split_t]
     yval = y_all[F_inj.index >= split_t]
     print(f"fit rows {len(Ffit)}, validation rows {len(Fval)}, validation prevalence {yval.mean():.3f}")
+    kw = {}
+    if not legacy:
+        # cell id per resampled row: the cell present in (the majority of) the block, else clean
+        n = (len(cell_nat) // a.factor) * a.factor
+        blk = cell_nat[:n].reshape(-1, a.factor)
+        present = (blk >= 0).mean(1) >= 0.5
+        cell_rs = np.where(present, blk.max(1), -1)
+        cells_all = pd.Series(cell_rs, index=t_w[:len(cell_rs)]).reindex(F_inj.index).fillna(-1).to_numpy().astype(int)
+        cells_val = cells_all[F_inj.index >= split_t]
+        kw = dict(cells=cells_val, n_cells=len(cell_tbl), min_spread=a.min_spread, min_lift=a.min_lift)
+        os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
+        cell_tbl.assign(n_val_rows=[int((cells_val == c).sum()) for c in cell_tbl.cell]).to_csv(a.out + "_val_cells.csv", index=False)
+        print(f"validation suite: {len(cell_tbl)} cells, event rows per cell: "
+              f"{[int((cells_val == c).sum()) for c in cell_tbl.cell]}")
 
     trials, chosen = equal_budget_search(a.families, Ffit, Fval, yval, FEATS,
-                                         n_trials=a.n_trials, seed=a.seed, spd=spd)
+                                         n_trials=a.n_trials, seed=a.seed, spd=spd, **kw)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     trials.to_csv(a.out + "_trials.csv", index=False)
-    print(trials.groupby("family").agg(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max"),
-                                       val_lift_max=("val_lift", "max"), informative=("informative", "first")).round(3))
+    agg = dict(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max"),
+               val_lift_max=("val_lift", "max"), informative=("informative", "first"))
+    if not legacy:
+        agg.update(macro_lift_min=("val_macro_lift", "min"), macro_lift_max=("val_macro_lift", "max"))
+    pd.set_option("display.width", 250)
+    print(trials.groupby("family").agg(**agg).round(3))
+    if not legacy:
+        lc = [c for c in trials if c.startswith("lift_cell_")]
+        print("per-cell validation lift of the DEFAULT config (1 = chance):")
+        d = trials[trials.trial_kind == "default"].set_index("family")[lc].round(2)
+        d.columns = [f"{r.type[:5]}{int(r.duration_days)}d" if r.type != "pulse" else "pulse" for r in cell_tbl.itertuples()]
+        print(d.to_string())
     for fam_name, ok in trials.groupby("family").informative.first().items():
         if not ok:
-            print(f"NOTE {fam_name}: validation cannot separate its configs (spread < 0.02); "
-                  f"the default config is used, 'tuned' == 'default' for this family")
+            print(f"NOTE {fam_name}: validation cannot separate its configs or sees no signal "
+                  f"(see lifts above); the default config is used, 'tuned' == 'default' for this family")
 
     # --- final evaluation on real data, identical rows for every detector
     F = build_features(t, x, spd, a.window_days)
@@ -109,6 +143,16 @@ if __name__ == "__main__":
     ap.add_argument("--families", nargs="+", default=["isolation_forest", "knn_inductive", "rolling_z"])
     ap.add_argument("--n-trials", type=int, default=8); ap.add_argument("--n-seeds", type=int, default=5)
     ap.add_argument("--window-days", type=float, default=30.0)
+    ap.add_argument("--val-suite", choices=["taxonomy", "legacy"], default="taxonomy",
+                    help="taxonomy: shift/burst/ramp/pulse x durations, macro-lift selection (default); "
+                         "legacy: the first version (shift+burst, 1 and 3 days, timestamp AUC-PR)")
+    ap.add_argument("--val-frac", type=float, default=0.35, help="share of the clean window used for validation")
+    ap.add_argument("--suite-durations", type=int, nargs="+", default=[1, 3, 7])
+    ap.add_argument("--suite-magnitudes", type=float, nargs="+", default=[1.5])
+    ap.add_argument("--suite-days-per-cell", type=float, default=4.0,
+                    help="target event-days per cell; events per cell = max(1, round(days / duration))")
+    ap.add_argument("--min-spread", type=float, default=0.1, help="taxonomy: min spread of macro lift across configs")
+    ap.add_argument("--min-lift", type=float, default=1.3, help="taxonomy: min best macro lift to count as informative")
     ap.add_argument("--val-durations", type=int, nargs="+", default=[1, 3])
     ap.add_argument("--val-prevalence", type=float, default=0.08)
     ap.add_argument("--val-magnitude", type=float, default=3.0)

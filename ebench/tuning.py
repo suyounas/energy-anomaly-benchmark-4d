@@ -109,8 +109,87 @@ def inject_into_series(t, x, val_start_idx, durations_days, prevalence, magnitud
     return x_new, y
 
 
+
+# ------------------------------------------------------------ validation suite (taxonomy)
+SUITE_TYPES = ("shift", "burst", "ramp", "pulse")
+PULSE_STEPS = 6                       # 3 h on the 30-min grid: survives resampling up to factor 6
+
+
+def suite_cells(types=SUITE_TYPES, durations_days=(1, 3, 7), magnitudes=(1.5,)):
+    """The declared event taxonomy: one 'cell' per (type, duration, magnitude).  Fixed a priori from
+    the kinds of grid stress the paper targets (level shifts, variance bursts, drifts, short
+    pulses) -- NOT from the test events -- so validation never sees test labels.  'pulse' has no
+    duration (always 3 h)."""
+    cells = []
+    for ty in types:
+        for d in ([0] if ty == "pulse" else durations_days):
+            for m in magnitudes:
+                cells.append(dict(cell=len(cells), type=ty, duration_days=d, magnitude=m))
+    return pd.DataFrame(cells)
+
+
+def make_validation_suite(t, x, val_start_idx, base_minutes=30, durations_days=(1, 3, 7),
+                          magnitudes=(1.5,), types=SUITE_TYPES, days_per_cell=4.0, seed=0):
+    """Inject the taxonomy into x[val_start_idx:] on the NATIVE grid.  The validation region is cut
+    into equal slots, one per cell, so every cell has its own events and its own clean surroundings.
+    Returns x_new, cell (int per timestamp, -1 = clean) and the cell table.  Magnitudes are in units
+    of the clean-part standard deviation of x."""
+    rng = np.random.default_rng(seed)
+    spd = int(24 * 60 / base_minutes)
+    tbl = suite_cells(types, durations_days, magnitudes)
+    x_new = np.asarray(x, float).copy(); cell = np.full(len(x), -1, int)
+    scale = float(np.std(x[:val_start_idx]))
+    if not np.isfinite(scale) or scale <= 0:
+        raise ValueError("injection scale is not finite/positive")
+    slot = (len(x) - val_start_idx) // len(tbl)
+    for i, r in tbl.iterrows():
+        lo = val_start_idx + i * slot
+        L = PULSE_STEPS if r.type == "pulse" else int(r.duration_days * spd)
+        n_ev = 4 if r.type == "pulse" else max(1, int(round(days_per_cell / r.duration_days)))
+        if slot < n_ev * (L + 2 * spd):
+            raise ValueError(f"validation region too short for cell {r.to_dict()}; "
+                             f"use a longer window or fewer cells")
+        stride = slot // n_ev
+        for k in range(n_ev):
+            room = stride - L - spd                                  # keep >= 1 clean day after the event
+            s = lo + k * stride + int(rng.integers(0, max(1, room)))
+            if r.type != "pulse":
+                s -= (s - val_start_idx) % spd                       # day-aligned like the test events
+                s = max(s, lo + k * stride)
+            e = s + L
+            amp = r.magnitude * scale
+            if r.type == "shift":
+                x_new[s:e] += amp
+            elif r.type == "burst":
+                x_new[s:e] += amp * rng.standard_normal(e - s)
+            elif r.type == "ramp":
+                x_new[s:e] += amp * np.linspace(0.0, 1.0, e - s)
+            elif r.type == "pulse":
+                x_new[s:e] += amp
+            cell[s:e] = int(r.cell)
+    return x_new, cell, tbl
+
+
+def macro_lift(score, cell, n_cells):
+    """Per-cell AUC-PR lift (positives = that cell's event timestamps, negatives = clean timestamps
+    only, so another cell's events never count as false alarms) and its mean over cells.  A lift of 1
+    is chance.  NaN scores are dropped.  Returns (mean_lift, per_cell_lifts)."""
+    score = np.asarray(score, float); cell = np.asarray(cell)
+    ok = ~np.isnan(score); score, cell = score[ok], cell[ok]
+    clean = cell < 0
+    lifts = []
+    for c in range(n_cells):
+        m = clean | (cell == c)
+        pos = (cell[m] == c).astype(int)
+        if pos.sum() == 0 or pos.sum() == len(pos):
+            lifts.append(np.nan); continue
+        lifts.append(auc_pr(pos, score[m]) / pos.mean())
+    return float(np.nanmean(lifts)), lifts
+
+
 # ------------------------------------------------------------ the search
-def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd=48, min_spread=0.02):
+def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd=48, min_spread=0.02,
+                        cells=None, n_cells=0, min_lift=1.3):
     """For each family: evaluate the default config and `n_trials` random configs on the
     validation set; select by validation AUC-PR.  Returns a tidy DataFrame (all trials) and the
     chosen config per family."""
@@ -127,16 +206,24 @@ def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd
             sc = fam["fn"](cfg, Ftr, Fval, cols, seed, spd=spd)
             ok = ~np.isnan(sc)
             val = auc_pr(yval[ok], sc[ok])
+            extra = {}
+            if cells is not None:
+                ml, per = macro_lift(sc, cells, n_cells)
+                extra = dict(val_macro_lift=ml, **{f"lift_cell_{i}": v for i, v in enumerate(per)})
+                crit = ml
+            else:
+                crit = val
             rows.append(dict(family=name, trial_kind=kind, val_auc_pr=val, val_prevalence=prev,
-                             val_lift=val / prev if prev else np.nan,
+                             val_lift=val / prev if prev else np.nan, **extra,
                              **{f"cfg_{k}": v for k, v in cfg.items()}))
-            if not np.isnan(val) and val > best[0]:
-                best = (val, cfg)
+            if not np.isnan(crit) and crit > best[0]:
+                best = (crit, cfg)
         if best[1] is None:
             raise ValueError(f"{name}: every validation AUC-PR was NaN; refusing to fall back silently")
-        vals = np.array([r["val_auc_pr"] for r in rows[start:]], float)
+        key = "val_macro_lift" if cells is not None else "val_auc_pr"
+        vals = np.array([r[key] for r in rows[start:]], float)
         spread = float(np.nanmax(vals) - np.nanmin(vals))
-        informative = spread >= min_spread
+        informative = spread >= min_spread and (cells is None or float(np.nanmax(vals)) >= min_lift)
         chosen[name] = best[1] if informative else fam["default"]
         for r in rows[start:]:
             r["val_spread"] = spread; r["informative"] = informative

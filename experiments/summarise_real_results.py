@@ -25,9 +25,14 @@ def equal_budget(ds):
     t = t.join(g[cov].mean().round(3)).reset_index()
     t.insert(2, "auc_pr_lift", (g.auc_pr.mean() / g.prevalence.first()).round(2).values)
     tr = pd.read_csv(f"{D}/{ds}_equal_budget_trials.csv")
-    v = tr.groupby("family").agg(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max")).round(3)
-    v["val_spread"] = (v.val_max - v.val_min).round(3)
-    v["selection_informative"] = v.val_spread >= 0.02
+    if "val_macro_lift" in tr.columns:            # taxonomy suite: select on macro lift (1 = chance)
+        v = tr.groupby("family").agg(val_min=("val_macro_lift", "min"), val_max=("val_macro_lift", "max")).round(3)
+        v["val_spread"] = (v.val_max - v.val_min).round(3)
+        v["selection_informative"] = (v.val_spread >= 0.1) & (v.val_max >= 1.3)
+    else:                                         # legacy suite: validation AUC-PR
+        v = tr.groupby("family").agg(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max")).round(3)
+        v["val_spread"] = (v.val_max - v.val_min).round(3)
+        v["selection_informative"] = v.val_spread >= 0.02
     return t, v.reset_index(), float(f.prevalence.iloc[0]), int(f.seed.nunique())
 
 
