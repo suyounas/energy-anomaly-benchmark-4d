@@ -1,0 +1,65 @@
+[RUN ] tuning_gb
+       python3 experiments/equal_budget_tuning.py --csv neso_demand_full.csv --time-col Datetime --value-col ND_MW --base-minutes 30 --factor 2 --event 2020-03-23 2020-05-31 COVID --event 2022-12-08 2022-12-17 ColdSnap --train-window 2018-06-01 2020-02-01 --families isolation_forest knn_inductive rolling_z --n-trials 8 --n-seeds 5 --val-suite taxonomy --out results/real/gb_equal_budget
+fit rows 9480, validation rows 5135, validation prevalence 0.199
+validation suite: 10 cells, event rows per cell: [96, 72, 168, 98, 72, 168, 96, 72, 168, 14]
+                  val_min  val_max  ...  macro_lift_min  macro_lift_max
+family                              ...                                
+isolation_forest    0.262    0.363  ...           2.497           6.408
+knn_inductive       0.244    0.247  ...           2.170           2.213
+rolling_z           0.234    0.310  ...           4.645           6.236
+
+[3 rows x 6 columns]
+per-cell validation lift of the DEFAULT config (1 = chance):
+                  shift1d  shift3d  shift7d  burst1d  burst3d  burst7d  ramp1d  ramp3d  ramp7d  pulse
+family                                                                                               
+isolation_forest     0.66     0.59     0.59     7.87    10.77     5.98    2.12    1.43    0.67   1.17
+knn_inductive        0.75     0.80     0.65     3.17     6.25     6.47    1.66    1.07    0.63   0.68
+rolling_z            1.71     1.70     1.11     8.43     9.49     2.77    1.00    1.07    1.28  31.81
+NOTE knn_inductive: validation cannot separate its configs or sees no signal (see lifts above); the default config is used, 'tuned' == 'default' for this family
+common evaluation rows: 55457 / 55457
+                         auc_pr         ts_f1  ... cov_COVID cov_ColdSnap     
+                           mean    std   mean  ...       std         mean  std
+family           config                        ...                            
+isolation_forest default  0.055  0.007  0.058  ...     0.035         0.00  0.0
+                 tuned    0.062  0.005  0.098  ...     0.031         0.00  0.0
+knn_inductive    default  0.054  0.000  0.002  ...     0.000         0.00  0.0
+                 tuned    0.054  0.000  0.002  ...     0.000         0.00  0.0
+rolling_z        default  0.035  0.000  0.026  ...     0.000         0.05  0.0
+                 tuned    0.035  0.000  0.027  ...     0.000         0.05  0.0
+
+[6 rows x 10 columns]
+[RUN ] tuning_ercot
+       python3 experiments/equal_budget_tuning.py --csv ercot_demand_full.csv --time-col Datetime --value-col Demand_MW --base-minutes 60 --factor 1 --event 2021-02-14 2021-02-19 Texas Freeze --event 2022-12-22 2022-12-26 Elliott spike --train-window 2021-06-01 2022-06-01 --families isolation_forest knn_inductive rolling_z --n-trials 8 --n-seeds 5 --val-suite taxonomy --suite-durations 1 3 --out results/real/ercot_equal_budget
+fit rows 5640, validation rows 3096, validation prevalence 0.171
+validation suite: 7 cells, event rows per cell: [96, 72, 96, 72, 96, 72, 24]
+                  val_min  val_max  ...  macro_lift_min  macro_lift_max
+family                              ...                                
+isolation_forest    0.368    0.443  ...           4.925           6.816
+knn_inductive       0.290    0.299  ...           4.603           4.645
+rolling_z           0.219    0.276  ...           3.028           4.532
+
+[3 rows x 6 columns]
+per-cell validation lift of the DEFAULT config (1 = chance):
+                  shift1d  shift3d  burst1d  burst3d  ramp1d  ramp3d  pulse
+family                                                                     
+isolation_forest     2.08     0.66    11.76    22.12    1.39    0.94   0.59
+knn_inductive        0.84     1.03     1.41    23.80    3.22    1.62   0.60
+rolling_z            1.98     1.33     6.69     5.28    0.97    1.28   9.53
+NOTE knn_inductive: validation cannot separate its configs or sees no signal (see lifts above); the default config is used, 'tuned' == 'default' for this family
+common evaluation rows: 35040 / 35040
+                         auc_pr       ts_f1  ... cov_Texas Freeze cov_Elliott spike     
+                           mean  std   mean  ...              std              mean  std
+family           config                      ...                                        
+isolation_forest default  0.005  0.0  0.000  ...            0.004             0.000  0.0
+                 tuned    0.005  0.0  0.001  ...            0.000             0.000  0.0
+knn_inductive    default  0.006  0.0  0.001  ...            0.000             0.000  0.0
+                 tuned    0.006  0.0  0.001  ...            0.000             0.000  0.0
+rolling_z        default  0.011  0.0  0.024  ...            0.000             0.117  0.0
+                 tuned    0.010  0.0  0.016  ...            0.000             0.100  0.0
+
+[6 rows x 10 columns]
+
+== summary ==
+ran:     tuning_gb tuning_ercot
+skipped: none
+failed:  none

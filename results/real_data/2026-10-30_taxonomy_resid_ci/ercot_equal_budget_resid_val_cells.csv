@@ -1,0 +1,8 @@
+cell,type,duration_days,magnitude,n_val_rows
+0,shift,1,1.5,96
+1,shift,3,1.5,72
+2,burst,1,1.5,96
+3,burst,3,1.5,72
+4,ramp,1,1.5,96
+5,ramp,3,1.5,72
+6,pulse,0,1.5,24

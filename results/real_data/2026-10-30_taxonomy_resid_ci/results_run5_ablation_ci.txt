@@ -1,0 +1,46 @@
+[RUN ] ablation_gb
+       python3 experiments/real_resolution_ablation.py --csv neso_demand_full.csv --time-col Datetime --value-col ND_MW --base-minutes 30 --event 2020-03-23 2020-05-31 COVID --event 2022-12-08 2022-12-17 ColdSnap --train-window 2018-06-01 2020-02-01 --factors 1 2 48 --features resid --out results/real/gb_resolution_ablation_resid.csv
+factor 1: n_train=29278 n_test=110290 prevalence=0.035
+factor 2: n_train=14639 n_test=55145 prevalence=0.035
+factor 48: n_train=610 n_test=2297 prevalence=0.035
+    factor          detector  alert_rate  ts_f1  f1_ceiling  auc_pr_lift  ev_f1  ts_f1_lo  ts_f1_hi  reliably_worse_than_best
+0        1  isolation_forest       0.050  0.120       0.821        2.221  0.149     0.055     0.201                     False
+1        1  dbscan_published       0.043  0.079       0.891        1.092  0.115     0.040     0.124                     False
+2        1     knn_inductive       0.050  0.018       0.821        1.818  0.164     0.004     0.037                      True
+3        1       z_published       0.050  0.027       0.821        0.936  0.058     0.016     0.036                      True
+4        1         z_rolling       0.000  0.000       0.000        1.005  0.000     0.000     0.000                      True
+5        1    z_rolling_top5       0.050  0.048       0.821        1.005  0.059     0.019     0.081                      True
+6        2  isolation_forest       0.050  0.124       0.821        2.280  0.160     0.053     0.198                     False
+7        2  dbscan_published       0.036  0.086       0.977        1.123  0.127     0.046     0.136                     False
+8        2     knn_inductive       0.050  0.019       0.821        1.722  0.163     0.007     0.034                      True
+9        2       z_published       0.050  0.020       0.821        0.921  0.049     0.010     0.031                      True
+10       2         z_rolling       0.000  0.000       0.000        1.007  0.000     0.000     0.000                      True
+11       2    z_rolling_top5       0.050  0.048       0.821        1.007  0.061     0.019     0.082                      True
+12      48  isolation_forest       0.050  0.133       0.821        2.685  0.229     0.058     0.224                     False
+13      48  dbscan_published       0.019  0.065       0.710        1.081  0.162     0.000     0.134                      True
+14      48     knn_inductive       0.050  0.103       0.821        2.602  0.217     0.025     0.191                     False
+15      48       z_published       0.050  0.010       0.821        0.939  0.034     0.000     0.032                      True
+16      48         z_rolling       0.000  0.000       0.025        1.309  0.000     0.000     0.000                      True
+17      48    z_rolling_top5       0.050  0.062       0.821        1.309  0.105     0.000     0.134                     False
+[RUN ] ablation_ercot
+       python3 experiments/real_resolution_ablation.py --csv ercot_demand_full.csv --time-col Datetime --value-col Demand_MW --base-minutes 60 --event 2021-02-14 2021-02-19 Texas Freeze --event 2022-12-22 2022-12-26 Elliott spike --train-window 2021-06-01 2022-06-01 --factors 1 24 --features resid --out results/real/ercot_resolution_ablation_resid.csv
+factor 1: n_train=8760 n_test=34728 prevalence=0.008
+factor 24: n_train=365 n_test=1447 prevalence=0.008
+    factor          detector  alert_rate  ts_f1  f1_ceiling  auc_pr_lift  ev_f1  ts_f1_lo  ts_f1_hi  reliably_worse_than_best
+0        1  isolation_forest       0.050  0.035       0.264        2.158  0.006       0.0     0.096                     False
+1        1  dbscan_published       0.027  0.079       0.436        2.032  0.075       0.0     0.163                     False
+2        1     knn_inductive       0.050  0.032       0.264        1.896  0.056       0.0     0.083                     False
+3        1       z_published       0.050  0.002       0.264        1.172  0.006       0.0     0.005                     False
+4        1         z_rolling       0.008  0.183       0.996       16.491  0.179       0.0     0.311                     False
+5        1    z_rolling_top5       0.050  0.087       0.264       16.491  0.034       0.0     0.191                     False
+6       24  isolation_forest       0.050  0.190       0.262       17.271  0.205       0.0     0.384                     False
+7       24  dbscan_published       0.024  0.478       0.478       41.343  0.250       0.0     0.694                     False
+8       24     knn_inductive       0.050  0.119       0.262       25.611  0.348       0.0     0.264                     False
+9       24       z_published       0.050  0.143       0.262       12.325  0.111       0.0     0.299                     False
+10      24         z_rolling       0.012  0.143       0.786       26.783  0.143       0.0     0.348                     False
+11      24    z_rolling_top5       0.050  0.071       0.262       26.783  0.085       0.0     0.164                     False
+
+== summary ==
+ran:     ablation_gb ablation_ercot
+skipped: none
+failed:  none
