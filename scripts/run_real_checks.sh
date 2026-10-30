@@ -6,6 +6,7 @@
 #        ERCOT_FLAGS (default ercot_flags.csv; written by code/study4_ercot_eia/02_full_pipeline.py)
 #        NEURAL=1 adds lstm_ae and transformer to the equal-budget tuning (slow; GPU advised)
 #        N_TRIALS (default 8)  N_SEEDS (default 5)  OUT (default results/real)
+#        VAL_SUITE=taxonomy|legacy (default taxonomy: shift/burst/ramp/pulse validation, macro-lift selection)
 # A step whose input file is missing is SKIPPED with a message, not treated as a pass.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -17,6 +18,7 @@ ERCOT_FLAGS=${ERCOT_FLAGS:-ercot_flags.csv}
 OUT=${OUT:-results/real}
 N_TRIALS=${N_TRIALS:-8}
 N_SEEDS=${N_SEEDS:-5}
+VAL_SUITE=${VAL_SUITE:-taxonomy}
 FAMS="isolation_forest knn_inductive rolling_z"
 [ "${NEURAL:-0}" = "1" ] && FAMS="$FAMS lstm_ae transformer"
 
@@ -59,10 +61,12 @@ step ablation_ercot "$ERCOT_CSV" "$PY" experiments/real_resolution_ablation.py -
   --factors 1 24 --out "$OUT/ercot_resolution_ablation.csv"
 step tuning_gb "$GB_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$GB_CSV" \
   --time-col Datetime --value-col ND_MW --base-minutes 30 --factor 2 "${GB_EVENTS[@]}" "${GB_TRAIN[@]}" \
-  --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --out "$OUT/gb_equal_budget"
+  --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --val-suite "$VAL_SUITE" \
+  --out "$OUT/gb_equal_budget"
 step tuning_ercot "$ERCOT_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$ERCOT_CSV" \
   --time-col Datetime --value-col Demand_MW --base-minutes 60 --factor 1 "${ER_EVENTS[@]}" "${ER_TRAIN[@]}" \
-  --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --out "$OUT/ercot_equal_budget"
+  --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --val-suite "$VAL_SUITE" \
+  --suite-durations 1 3 --out "$OUT/ercot_equal_budget"
 step tiers "$ERCOT_FLAGS" "$PY" experiments/ercot_label_tiers.py --flags "$ERCOT_FLAGS" \
   --out "$OUT/ercot_tiers.csv"
 
