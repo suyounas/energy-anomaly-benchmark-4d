@@ -136,3 +136,40 @@ def block_bootstrap_ci(times, metric_fn, n_boot=1000, seed=0, alpha=0.05, block=
         return point, float("nan"), float("nan"), len(uniq)
     lo, hi = np.percentile(vals, [100 * alpha / 2, 100 * (1 - alpha / 2)])
     return point, float(lo), float(hi), len(uniq)
+
+
+def paired_block_bootstrap(times, metric_fns, n_boot=300, seed=0, alpha=0.05, block="7D"):
+    """Block bootstrap that evaluates SEVERAL metrics on the SAME resampled rows, so differences between
+    detectors are paired (a replicate that is hard for one detector is hard for all).  `block` is a
+    pandas offset ('7D' keeps the serial dependence inside a week and, for multi-day events, mostly
+    keeps an event together; plain days understate the uncertainty when there are only a few events).
+    `metric_fns` is {name: f(index_array) -> float}.  Returns {name: array of replicate values}."""
+    t = pd.DatetimeIndex(times)
+    keys = t.floor(block)
+    uniq = pd.unique(keys)
+    groups = {k: np.where(keys == k)[0] for k in uniq}
+    rng = np.random.default_rng(seed)
+    out = {k: [] for k in metric_fns}
+    for _ in range(n_boot):
+        pick = rng.choice(len(uniq), size=len(uniq), replace=True)
+        idx = np.concatenate([groups[uniq[i]] for i in pick])
+        for k, fn in metric_fns.items():
+            out[k].append(fn(idx))
+    return {k: np.asarray(v, float) for k, v in out.items()}
+
+
+def summarise_paired(reps, point, alpha=0.05):
+    """From replicate arrays and point estimates, return per-name (lo, hi) and the difference to the best
+    point estimate: (best_name, {name: (diff_point, diff_lo, diff_hi)}).  A diff interval entirely below 0
+    means the detector is reliably worse than the best one; one that contains 0 means 'cannot tell'."""
+    lo_q, hi_q = 100 * alpha / 2, 100 * (1 - alpha / 2)
+    ci = {k: tuple(np.nanpercentile(v, [lo_q, hi_q])) if np.isfinite(v).any() else (np.nan, np.nan)
+          for k, v in reps.items()}
+    best = max(point, key=lambda k: point[k])
+    diffs = {}
+    for k in reps:
+        d = reps[k] - reps[best]
+        ok = np.isfinite(d)
+        diffs[k] = (point[k] - point[best],) + (tuple(np.percentile(d[ok], [lo_q, hi_q])) if ok.any() else (np.nan, np.nan))
+    return ci, best, diffs
+

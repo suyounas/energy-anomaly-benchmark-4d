@@ -11,5 +11,6 @@ Rules enforced here (each answers a reviewer point, see docs/REVISION_LOG.md):
 from .metrics import (  # noqa: F401
     event_end_exclusive, event_mask, per_event_coverage, event_level_prf,
     timestamp_level_prf, auc_pr, f1_ceiling_at_budget, block_bootstrap_ci,
+    paired_block_bootstrap, summarise_paired,
 )
 from .windows import contiguous_segments, make_windows  # noqa: F401
