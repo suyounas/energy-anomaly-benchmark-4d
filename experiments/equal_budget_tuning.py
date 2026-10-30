@@ -25,7 +25,7 @@ from ebench import timestamp_level_prf, event_level_prf, per_event_coverage, auc
 from ebench.synthetic import resample
 from ebench.detectors import top_pct_flag
 from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series, make_validation_suite
-from real_resolution_ablation import build_features, FEATS
+from real_resolution_ablation import build_features, feature_cols
 
 
 def main(a):
@@ -54,7 +54,8 @@ def main(a):
             days_per_cell=a.suite_days_per_cell, seed=a.seed)
         y_inj_nat = (cell_nat >= 0).astype(int)
     t_w, x_inj, y_inj = resample(t0[m0], x_inj_nat, y_inj_nat, a.factor)
-    F_inj = build_features(t_w, x_inj, spd, a.window_days)
+    FEATS = feature_cols(a.features); resid = a.features == "resid"
+    F_inj = build_features(t_w, x_inj, spd, a.window_days, with_resid=resid)
     y_all = pd.Series(y_inj, index=t_w).reindex(F_inj.index).fillna(0).to_numpy().astype(int)
     split_t = t_w[min(n_fit_native // a.factor, len(t_w) - 1)]
     Ffit, Fval = F_inj[F_inj.index < split_t], F_inj[F_inj.index >= split_t]
@@ -97,7 +98,7 @@ def main(a):
                   f"(see lifts above); the default config is used, 'tuned' == 'default' for this family")
 
     # --- final evaluation on real data, identical rows for every detector
-    F = build_features(t, x, spd, a.window_days)
+    F = build_features(t, x, spd, a.window_days, with_resid=resid)
     tt = F.index
     in_tr = (tt >= lo) & (tt < hi)
     Ftr, Fte = F[in_tr], F[~in_tr]
@@ -143,6 +144,8 @@ if __name__ == "__main__":
     ap.add_argument("--families", nargs="+", default=["isolation_forest", "knn_inductive", "rolling_z"])
     ap.add_argument("--n-trials", type=int, default=8); ap.add_argument("--n-seeds", type=int, default=5)
     ap.add_argument("--window-days", type=float, default=30.0)
+    ap.add_argument("--features", choices=["recipe", "resid"], default="recipe",
+                    help="recipe = published 4 features (default); resid = + causal seasonal-naive residual")
     ap.add_argument("--val-suite", choices=["taxonomy", "legacy"], default="taxonomy",
                     help="taxonomy: shift/burst/ramp/pulse x durations, macro-lift selection (default); "
                          "legacy: the first version (shift+burst, 1 and 3 days, timestamp AUC-PR)")

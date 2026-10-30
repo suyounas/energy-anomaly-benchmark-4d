@@ -6,6 +6,8 @@
 #        ERCOT_FLAGS (default ercot_flags.csv; written by code/study4_ercot_eia/02_full_pipeline.py)
 #        NEURAL=1 adds lstm_ae and transformer to the equal-budget tuning (slow; GPU advised)
 #        N_TRIALS (default 8)  N_SEEDS (default 5)  OUT (default results/real)
+#        FEATURES=recipe|resid (default recipe = published 4 features; resid adds a causal seasonal-naive residual;
+#        outputs get a _resid suffix so the two runs never overwrite each other)
 #        VAL_SUITE=taxonomy|legacy (default taxonomy: shift/burst/ramp/pulse validation, macro-lift selection)
 # A step whose input file is missing is SKIPPED with a message, not treated as a pass.
 set -euo pipefail
@@ -19,6 +21,8 @@ OUT=${OUT:-results/real}
 N_TRIALS=${N_TRIALS:-8}
 N_SEEDS=${N_SEEDS:-5}
 VAL_SUITE=${VAL_SUITE:-taxonomy}
+FEATURES=${FEATURES:-recipe}
+TAG=""; [ "$FEATURES" = "recipe" ] || TAG="_$FEATURES"
 FAMS="isolation_forest knn_inductive rolling_z"
 [ "${NEURAL:-0}" = "1" ] && FAMS="$FAMS lstm_ae transformer"
 
@@ -55,18 +59,20 @@ ER_TRAIN=(--train-window 2021-06-01 2022-06-01)
 step tests "" "$PY" -m pytest -q
 step ablation_gb "$GB_CSV" "$PY" experiments/real_resolution_ablation.py --csv "$GB_CSV" \
   --time-col Datetime --value-col ND_MW --base-minutes 30 "${GB_EVENTS[@]}" "${GB_TRAIN[@]}" \
-  --factors 1 2 48 --out "$OUT/gb_resolution_ablation.csv"
+  --factors 1 2 48 --features "$FEATURES" --out "$OUT/gb_resolution_ablation$TAG.csv"
 step ablation_ercot "$ERCOT_CSV" "$PY" experiments/real_resolution_ablation.py --csv "$ERCOT_CSV" \
   --time-col Datetime --value-col Demand_MW --base-minutes 60 "${ER_EVENTS[@]}" "${ER_TRAIN[@]}" \
-  --factors 1 24 --out "$OUT/ercot_resolution_ablation.csv"
+  --factors 1 24 --features "$FEATURES" --out "$OUT/ercot_resolution_ablation$TAG.csv"
 step tuning_gb "$GB_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$GB_CSV" \
   --time-col Datetime --value-col ND_MW --base-minutes 30 --factor 2 "${GB_EVENTS[@]}" "${GB_TRAIN[@]}" \
   --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --val-suite "$VAL_SUITE" \
-  --out "$OUT/gb_equal_budget"
+  --features "$FEATURES" \
+  --out "$OUT/gb_equal_budget$TAG"
 step tuning_ercot "$ERCOT_CSV" "$PY" experiments/equal_budget_tuning.py --csv "$ERCOT_CSV" \
   --time-col Datetime --value-col Demand_MW --base-minutes 60 --factor 1 "${ER_EVENTS[@]}" "${ER_TRAIN[@]}" \
   --families $FAMS --n-trials "$N_TRIALS" --n-seeds "$N_SEEDS" --val-suite "$VAL_SUITE" \
-  --suite-durations 1 3 --out "$OUT/ercot_equal_budget"
+  --features "$FEATURES" \
+  --suite-durations 1 3 --out "$OUT/ercot_equal_budget$TAG"
 step tiers "$ERCOT_FLAGS" "$PY" experiments/ercot_label_tiers.py --flags "$ERCOT_FLAGS" \
   --out "$OUT/ercot_tiers.csv"
 

@@ -24,10 +24,32 @@ from ebench import (timestamp_level_prf, event_level_prf, per_event_coverage, au
 from ebench.detectors import run_classical
 from ebench.synthetic import resample
 
-FEATS = ["ret", "roll_mean", "roll_std", "roll_skew"]
+FEATS = ["ret", "roll_mean", "roll_std", "roll_skew"]         # the published recipe: no level information
+FEATS_RESID = FEATS + ["resid"]                                 # + causal seasonal-naive residual
 
 
-def build_features(t, x, samples_per_day, window_days):
+def feature_cols(name):
+    return {"recipe": FEATS, "resid": FEATS_RESID}[name]
+
+
+def seasonal_residual(s, samples_per_day, n_weeks=4, min_lags=2):
+    """Level information that is causal and needs no fitting: value minus the median of the same
+    time of the week over the previous `n_weeks` weeks (seasonal-naive forecast residual), divided by
+    the series' own robust spread of that residual (median absolute deviation over the whole input,
+    which is a scale only).  A level shift that lasts days stays visible for as long as it lasts; a
+    pure weekly pattern gives 0.  Uses only past values, so it cannot leak test information."""
+    lag = 7 * samples_per_day
+    past = np.column_stack([s.shift(k * lag).to_numpy() for k in range(1, n_weeks + 1)])
+    ok = np.isfinite(past).sum(1) >= min_lags
+    base = np.full(len(s), np.nan)
+    base[ok] = np.nanmedian(past[ok], axis=1)
+    r = s.to_numpy() - base
+    mad = np.nanmedian(np.abs(r - np.nanmedian(r))) * 1.4826
+    floor = 1e-3 * float(np.nanstd(s.to_numpy())) or 1.0          # never divide float noise by ~0
+    return r / (mad if np.isfinite(mad) and mad > floor else floor)
+
+
+def build_features(t, x, samples_per_day, window_days, with_resid=False):
     w = max(8, int(window_days * samples_per_day))
     s = pd.Series(x, index=t)
     ret = s.pct_change()
@@ -35,6 +57,8 @@ def build_features(t, x, samples_per_day, window_days):
                       "roll_mean": s.rolling(w, min_periods=max(2, w // 30)).mean().values,
                       "roll_std": s.rolling(w, min_periods=max(2, w // 30)).std().values,
                       "roll_skew": ret.rolling(w, min_periods=max(2, w // 30)).skew().values}, index=t)
+    if with_resid:
+        F["resid"] = seasonal_residual(s, samples_per_day)
     return F.replace([np.inf, -np.inf], np.nan).dropna()
 
 
@@ -48,7 +72,7 @@ def main(a):
         # aggregate by mean over f base steps (labels are derived from dates, so no label aggregation)
         t, x, _ = resample(t0, x0, np.zeros(len(x0), int), f)
         spd = int(round(24 * 60 / (a.base_minutes * f)))
-        F = build_features(t, x, spd, a.window_days)
+        F = build_features(t, x, spd, a.window_days, with_resid=a.features == "resid")
         tt = F.index
         y = np.zeros(len(F), int)
         for s, e, n in events:
@@ -56,7 +80,7 @@ def main(a):
         in_train = (tt >= tr0) & (tt < tr1)
         Ftr, Fte = F[in_train], F[~in_train]
         yte, tte = y[~in_train], tt[~in_train]
-        res = run_classical(Ftr, Fte, seed=a.seed, cols=FEATS)
+        res = run_classical(Ftr, Fte, seed=a.seed, cols=feature_cols(a.features))
         pi = float(yte.mean())
         for det, (score, flag) in res.items():
             flag = np.asarray(flag).astype(int)
@@ -90,6 +114,8 @@ if __name__ == "__main__":
     ap.add_argument("--window-days", type=float, default=30.0)
     ap.add_argument("--factors", type=int, nargs="+", default=[1, 2, 48])
     ap.add_argument("--tol-days", type=float, default=1.0)
+    ap.add_argument("--features", choices=["recipe", "resid"], default="recipe",
+                    help="recipe = published 4 features (default); resid = + causal seasonal-naive residual")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default="results/real/resolution_ablation.csv")
     main(ap.parse_args())
