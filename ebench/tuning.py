@@ -110,7 +110,7 @@ def inject_into_series(t, x, val_start_idx, durations_days, prevalence, magnitud
 
 
 # ------------------------------------------------------------ the search
-def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd=48):
+def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd=48, min_spread=0.02):
     """For each family: evaluate the default config and `n_trials` random configs on the
     validation set; select by validation AUC-PR.  Returns a tidy DataFrame (all trials) and the
     chosen config per family."""
@@ -121,15 +121,23 @@ def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd
     for name in families:
         fam = FAMILIES[name]
         cands = [("default", fam["default"])] + [("random", c) for c in sample_configs(fam["space"], n_trials, rng)]
-        best = (-1.0, None)
+        best = (-1.0, None); start = len(rows)
+        prev = float(np.mean(yval))
         for kind, cfg in cands:
             sc = fam["fn"](cfg, Ftr, Fval, cols, seed, spd=spd)
             ok = ~np.isnan(sc)
             val = auc_pr(yval[ok], sc[ok])
-            rows.append(dict(family=name, trial_kind=kind, val_auc_pr=val, **{f"cfg_{k}": v for k, v in cfg.items()}))
+            rows.append(dict(family=name, trial_kind=kind, val_auc_pr=val, val_prevalence=prev,
+                             val_lift=val / prev if prev else np.nan,
+                             **{f"cfg_{k}": v for k, v in cfg.items()}))
             if not np.isnan(val) and val > best[0]:
                 best = (val, cfg)
         if best[1] is None:
             raise ValueError(f"{name}: every validation AUC-PR was NaN; refusing to fall back silently")
-        chosen[name] = best[1]
+        vals = np.array([r["val_auc_pr"] for r in rows[start:]], float)
+        spread = float(np.nanmax(vals) - np.nanmin(vals))
+        informative = spread >= min_spread
+        chosen[name] = best[1] if informative else fam["default"]
+        for r in rows[start:]:
+            r["val_spread"] = spread; r["informative"] = informative
     return pd.DataFrame(rows), chosen

@@ -95,3 +95,41 @@ def test_classical_detectors_return_aligned_scores_and_binary_flags():
     for name, (score, flag) in res.items():
         assert len(score) == len(flag) == 3000, name
         assert set(np.unique(flag)) <= {0, 1}, name
+
+
+def test_uninformative_validation_keeps_default_config(monkeypatch):
+    """If every config scores the same on validation, argmax would be selection on noise."""
+    import ebench.tuning as tu
+    t, x = _series(1.0)
+    vs = int(0.7 * len(x)); vs -= vs % STEPS_PER_DAY
+    x2, y = inject_into_series(t, x, vs, (1, 3), 0.08, 3.0, seed=0)
+    F = features(x2, STEPS_PER_DAY)
+    cols = ["value", "ret", "roll_mean", "roll_std"]
+    rng = np.random.default_rng(0)
+    flat = rng.random(len(F) - vs)                      # same uninformative score for every config
+    fam = dict(tu.FAMILIES["knn_inductive"]); fam["fn"] = lambda cfg, Ftr, Fev, cols, seed, **_: flat
+    monkeypatch.setitem(tu.FAMILIES, "knn_inductive", fam)
+    trials, chosen = equal_budget_search(["knn_inductive"], F.iloc[:vs], F.iloc[vs:], y[vs:], cols, n_trials=4)
+    assert chosen["knn_inductive"] == fam["default"]
+    assert not trials.informative.any()
+    assert (trials.val_lift.between(0.5, 1.5)).all()    # score ~ prevalence = chance
+
+
+def test_informative_validation_selects_the_best_config():
+    t, x = _series(1.0)
+    vs = int(0.7 * len(x)); vs -= vs % STEPS_PER_DAY
+    x2, y = inject_into_series(t, x, vs, (1, 3), 0.08, 3.0, seed=0)
+    F = features(x2, STEPS_PER_DAY)
+    cols = ["value", "ret", "roll_mean", "roll_std"]
+    trials, chosen = equal_budget_search(["rolling_z"], F.iloc[:vs], F.iloc[vs:], y[vs:], cols, n_trials=5)
+    if trials.informative.iloc[0]:
+        best = trials.loc[trials.val_auc_pr.idxmax()]
+        assert chosen["rolling_z"]["window_days"] == best.cfg_window_days
+
+
+def test_z_rolling_top5_uses_the_same_alert_budget_as_other_detectors():
+    t, x = _series(1.0)
+    F = features(x, STEPS_PER_DAY)
+    res = run_classical(F.iloc[:12000], F.iloc[12000:15000])
+    assert abs(res["z_rolling_top5"][1].mean() - 0.05) < 0.01
+    assert res["z_rolling"][1].mean() < 0.03            # the fixed z>3 rule fires far less often

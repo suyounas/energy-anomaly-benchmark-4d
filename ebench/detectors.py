@@ -41,6 +41,8 @@ def run_classical(F_train, F_test, seed=0, pct=95, cols=None):
       knn_inductive      score = distance to 5th nearest TRAIN neighbour; flag=top5% (inductive DBSCAN-like)
       z_published        |return| > its 95th percentile on TEST (what the code actually does)
       z_rolling          |value - trailing mean| / trailing std > 3   (what the paper text says)
+      z_rolling_top5     same score, flagged at the top 5% so it has the same alert budget as the
+                         other detectors (z_rolling's fixed threshold fires on 0-1% of real data)
     """
     cols = list(cols) if cols is not None else list(F_train.columns)
     sc = StandardScaler().fit(F_train[cols])
@@ -67,6 +69,7 @@ def run_classical(F_train, F_test, seed=0, pct=95, cols=None):
 
     zr = np.abs((F_test["value"] - F_test["roll_mean"]) / (F_test["roll_std"] + 1e-9)).to_numpy()
     out["z_rolling"] = (zr, (zr > 3).astype(int))
+    out["z_rolling_top5"] = (zr, top_pct_flag(np.nan_to_num(zr), pct))
     return out
 
 
