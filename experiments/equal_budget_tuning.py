@@ -21,7 +21,8 @@ import argparse, os, sys
 import numpy as np, pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from ebench import timestamp_level_prf, event_level_prf, per_event_coverage, auc_pr, event_mask
+from ebench import (timestamp_level_prf, event_level_prf, per_event_coverage, auc_pr, event_mask,
+                    paired_block_bootstrap, summarise_paired)
 from ebench.synthetic import resample
 from ebench.detectors import top_pct_flag
 from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series, make_validation_suite
@@ -133,6 +134,27 @@ def main(a):
     agg = res.groupby(["family", "config"])[["auc_pr", "ts_f1", "ev_f1"] + [c for c in res if c.startswith("cov_")]].agg(["mean", "std"]).round(3)
     pd.set_option("display.width", 250); print(agg)
 
+    if a.n_boot > 0:
+        # paired block bootstrap of the seed-averaged timestamp F1 for every (family, config); a
+        # config that equals the default (gate kept it, or tuning picked it) is reported once.
+        flags = {}
+        for (name, tag, seed), sc in score_store.items():
+            if tag == "tuned" and chosen[name] == FAMILIES[name]["default"]:
+                continue
+            flags.setdefault(f"{name}|{tag}", []).append(top_pct_flag(sc[common], 95))
+        def mk(fl_list):
+            return lambda idx: float(np.mean([timestamp_level_prf(yc[idx], f[idx])["f1"] for f in fl_list]))
+        fns = {k: mk(v) for k, v in flags.items()}
+        reps = paired_block_bootstrap(tc, fns, n_boot=a.n_boot, seed=a.seed, block=a.ci_block)
+        point = {k: fn(np.arange(len(yc))) for k, fn in fns.items()}
+        ci, best, diffs = summarise_paired(reps, point)
+        ci_df = pd.DataFrame([dict(detector=k, ts_f1=point[k], ts_f1_lo=ci[k][0], ts_f1_hi=ci[k][1], best=best,
+                                   diff_vs_best=diffs[k][0], diff_lo=diffs[k][1], diff_hi=diffs[k][2],
+                                   reliably_worse_than_best=bool(diffs[k][2] < 0)) for k in flags])
+        ci_df.to_csv(a.out + "_ci.csv", index=False)
+        print(f"paired {a.ci_block}-block bootstrap, {a.n_boot} replicates (seed-averaged ts_f1):")
+        print(ci_df[["detector", "ts_f1", "ts_f1_lo", "ts_f1_hi", "reliably_worse_than_best"]].round(3).to_string(index=False))
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
@@ -156,6 +178,8 @@ if __name__ == "__main__":
                     help="target event-days per cell; events per cell = max(1, round(days / duration))")
     ap.add_argument("--min-spread", type=float, default=0.1, help="taxonomy: min spread of macro lift across configs")
     ap.add_argument("--min-lift", type=float, default=1.3, help="taxonomy: min best macro lift to count as informative")
+    ap.add_argument("--n-boot", type=int, default=200, help="paired block-bootstrap replicates for ts_f1 (0 = off)")
+    ap.add_argument("--ci-block", default="7D", help="bootstrap block (pandas offset)")
     ap.add_argument("--val-durations", type=int, nargs="+", default=[1, 3])
     ap.add_argument("--val-prevalence", type=float, default=0.08)
     ap.add_argument("--val-magnitude", type=float, default=3.0)
