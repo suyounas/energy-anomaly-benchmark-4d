@@ -115,3 +115,31 @@ def test_block_bootstrap_ci_contains_point_estimate_and_is_reproducible():
     a = block_bootstrap_ci(t, f, n_boot=200, seed=3)
     b = block_bootstrap_ci(t, f, n_boot=200, seed=3)
     assert a == b and a[1] <= a[0] <= a[2] and a[3] == 60
+
+
+def test_paired_bootstrap_difference_is_reliable_for_a_clearly_better_detector():
+    from ebench import paired_block_bootstrap, summarise_paired
+    t = hourly("2020-01-01", "2020-04-01")
+    y = np.zeros(len(t), int); y[500:560] = 1; y[1500:1580] = 1; y[2000:2050] = 1
+    good = y.copy(); bad = np.zeros(len(t), int); bad[100:160] = 1; bad[3000:3030] = 1
+    fns = {"good": lambda idx: timestamp_level_prf(y[idx], good[idx])["f1"],
+           "bad": lambda idx: timestamp_level_prf(y[idx], bad[idx])["f1"]}
+    reps = paired_block_bootstrap(t, fns, n_boot=100, seed=1, block="7D")
+    point = {k: fn(np.arange(len(t))) for k, fn in fns.items()}
+    ci, best, diffs = summarise_paired(reps, point)
+    assert best == "good" and diffs["good"][0] == 0.0
+    assert diffs["bad"][2] < 0                                   # reliably worse
+    assert ci["good"][0] <= point["good"] <= ci["good"][1]
+
+
+def test_paired_bootstrap_cannot_separate_identical_detectors_and_is_reproducible():
+    from ebench import paired_block_bootstrap, summarise_paired
+    t = hourly("2020-01-01", "2020-03-01")
+    y = np.zeros(len(t), int); y[300:360] = 1
+    f = y.copy()
+    fns = {"a": lambda idx: timestamp_level_prf(y[idx], f[idx])["f1"], "b": lambda idx: timestamp_level_prf(y[idx], f[idx])["f1"]}
+    r1 = paired_block_bootstrap(t, fns, n_boot=50, seed=2)
+    r2 = paired_block_bootstrap(t, fns, n_boot=50, seed=2)
+    assert np.array_equal(r1["a"], r2["a"], equal_nan=True)
+    ci, best, diffs = summarise_paired(r1, {"a": 1.0, "b": 1.0})
+    assert diffs["b"][1] <= 0 <= diffs["b"][2]

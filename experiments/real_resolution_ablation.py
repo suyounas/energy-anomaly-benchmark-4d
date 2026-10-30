@@ -20,7 +20,7 @@ import numpy as np, pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from ebench import (timestamp_level_prf, event_level_prf, per_event_coverage, auc_pr,
-                    f1_ceiling_at_budget, event_mask)
+                    f1_ceiling_at_budget, event_mask, paired_block_bootstrap, summarise_paired)
 from ebench.detectors import run_classical
 from ebench.synthetic import resample
 
@@ -97,12 +97,27 @@ def main(a):
             for name, c in cov.items():
                 r[f"cov_{name}"] = c["coverage"]
             rows.append(r)
+        if a.n_boot > 0:
+            flags = {d: np.asarray(fl).astype(int) for d, (_, fl) in res.items()}
+            fns = {d: (lambda idx, fl=fl: timestamp_level_prf(yte[idx], fl[idx])["f1"]) for d, fl in flags.items()}
+            reps = paired_block_bootstrap(tte, fns, n_boot=a.n_boot, seed=a.seed, block=a.ci_block)
+            point = {d: timestamp_level_prf(yte, fl)["f1"] for d, fl in flags.items()}
+            ci, best, diffs = summarise_paired(reps, point)
+            for r in rows:
+                if r["factor"] == f:
+                    d = r["detector"]
+                    r.update(ts_f1_lo=ci[d][0], ts_f1_hi=ci[d][1], best_detector=best,
+                             diff_vs_best=diffs[d][0], diff_vs_best_lo=diffs[d][1], diff_vs_best_hi=diffs[d][2],
+                             reliably_worse_than_best=bool(diffs[d][2] < 0))
         print(f"factor {f}: n_train={len(Ftr)} n_test={len(Fte)} prevalence={pi:.3f}", flush=True)
     out = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(a.out) or ".", exist_ok=True)
     out.to_csv(a.out, index=False)
     pd.set_option("display.width", 220)
-    print(out[["factor", "detector", "alert_rate", "ts_f1", "f1_ceiling", "auc_pr_lift", "ev_f1"]].round(3).to_string())
+    show = ["factor", "detector", "alert_rate", "ts_f1", "f1_ceiling", "auc_pr_lift", "ev_f1"]
+    if a.n_boot > 0:
+        show += ["ts_f1_lo", "ts_f1_hi", "reliably_worse_than_best"]
+    print(out[show].round(3).to_string())
 
 
 if __name__ == "__main__":
@@ -116,6 +131,8 @@ if __name__ == "__main__":
     ap.add_argument("--tol-days", type=float, default=1.0)
     ap.add_argument("--features", choices=["recipe", "resid"], default="recipe",
                     help="recipe = published 4 features (default); resid = + causal seasonal-naive residual")
+    ap.add_argument("--n-boot", type=int, default=300, help="paired block-bootstrap replicates for ts_f1 (0 = off)")
+    ap.add_argument("--ci-block", default="7D", help="bootstrap block (pandas offset); 7D keeps events mostly intact")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default="results/real/resolution_ablation.csv")
     main(ap.parse_args())
