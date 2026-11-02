@@ -75,3 +75,9 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * `experiments/summarise_real_results.py` takes `--dir`, `--suffix`, `--out` and adds the coverage table and the interval tables (F1, AUC-PR, VUS-PR) per dataset.
 * Caveats stated in the code and the summary: the "best" detector is chosen post hoc among those listed; VUS-PR is our re-implementation; bootstrap replicates of a range metric can contain block seams.
 * Tests: 116 pass (9 new, including one that runs the CLI end to end).
+
+## Step 8, 2 Nov 2026: public-benchmark held-out test of the withdrawn duration rule
+* Pre-registered first: `docs/STEP8_PREREGISTRATION.md` (claim, data, primary test and decision rule fixed before any benchmark series is analysed).
+* New `ebench/crossseries.py`: partial Spearman, dataset-stratified Fisher-z combination, bootstrap over source datasets, mean rank by bin.
+* New `experiments/public_benchmark.py` (`run` / `analyse`): TSB-AD-U loader (prints schema, fails loudly), training prefix from the `_tr_<N>_` file name, autocorrelation period estimate, nine detectors scored on the SAME test rows, AUC-PR and VUS-PR per series, resumable and parallel. The archive is not reachable from the authoring sandbox: the run happens on the user's machine, so no result exists yet.
+* Tests: new tests for the statistics and a synthetic TSB-AD-format end-to-end run; fixed a period-estimation bug found by them (the ACF maximum at tiny lags was taken as the period; now local maxima only).
