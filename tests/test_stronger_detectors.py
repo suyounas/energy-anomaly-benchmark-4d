@@ -122,3 +122,26 @@ def test_matrix_profile_matches_brute_force_ab_join():
         want[j] = np.sqrt(((ref - q) ** 2).sum(1)).min()
     assert np.isnan(got[:m - 1]).all()
     np.testing.assert_allclose(got[m - 1:], want[m - 1:], atol=1e-6)
+
+
+def test_non_finite_input_fails_loudly_instead_of_returning_garbage():
+    Ftr, Fev, _, _ = make()
+    bad = Fev.copy()
+    bad.iloc[50, bad.columns.get_loc("value")] = np.inf
+    with pytest.raises((FloatingPointError, ValueError)):
+        FAMILIES["matrix_profile"]["fn"](dict(window_days=0.5), Ftr, bad, COLS, 0, spd=SPD)
+    bad2 = Fev.copy()                    # window_pca sees the model features (the recipe has no raw `value`)
+    bad2.iloc[50, bad2.columns.get_loc("roll_mean")] = np.inf
+    with pytest.raises((FloatingPointError, ValueError)):
+        FAMILIES["window_pca"]["fn"]({"n_components": 4}, Ftr, bad2, COLS, 0)
+
+
+def test_finite_results_are_unchanged_by_silencing_flags():
+    """Same brute-force reference as before, now also asserting that no RuntimeWarning escapes."""
+    import warnings
+    Ftr, Fev, _, _ = make()
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", RuntimeWarning)
+        for n in ("matrix_profile", "window_pca"):
+            f = FAMILIES[n]
+            f["fn"](f["default"], Ftr, Fev, COLS, 0, spd=SPD)

@@ -49,6 +49,15 @@ def _subsample(W, max_ref=MAX_REF):
     return W[idx]
 
 
+def _require_finite(a, what):
+    """Some BLAS builds (notably Apple Accelerate under numpy 2.x) raise spurious divide/overflow/invalid
+    floating-point FLAGS inside matmul on perfectly finite data.  We silence the flags in our own matmuls
+    and check the RESULT instead: a real overflow or NaN still fails loudly."""
+    if not np.isfinite(a).all():
+        raise FloatingPointError(f"{what}: non-finite values in the result (check for inf/NaN or constant input)")
+    return a
+
+
 def _scatter(n, idx, vals):
     out = np.full(n, np.nan)
     if len(idx):
@@ -82,9 +91,11 @@ def score_seasonal_naive(cfg, Ftr, Fev, cols, seed, **_):
 def score_window_pca(cfg, Ftr, Fev, cols, seed, **_):
     Xtr, Xev, idx = _flat_windows(cfg, Ftr, Fev, cols)
     k = int(min(cfg["n_components"], Xtr.shape[1], len(Xtr) - 1))
-    pca = PCA(n_components=k, random_state=seed).fit(Xtr)
-    rec = pca.inverse_transform(pca.transform(Xev))
-    return _scatter(len(Fev), idx, ((Xev - rec) ** 2).mean(1))
+    with np.errstate(all="ignore"):
+        pca = PCA(n_components=k, random_state=seed).fit(Xtr)
+        rec = pca.inverse_transform(pca.transform(Xev))
+        err = ((Xev - rec) ** 2).mean(1)
+    return _scatter(len(Fev), idx, _require_finite(err, "window_pca"))
 
 
 def score_window_knn(cfg, Ftr, Fev, cols, seed, **_):
@@ -121,9 +132,11 @@ def score_matrix_profile(cfg, Ftr, Fev, cols, seed, spd=48, **_):
         return np.full(len(Fev), np.nan)
     ref = _subsample(Ztr)
     best = np.empty(len(Zev))
-    for i in range(0, len(Zev), 2048):
-        corr = Zev[i:i + 2048] @ ref.T / m
-        best[i:i + 2048] = np.sqrt(np.maximum(2 * m * (1 - corr.max(1)), 0.0))
+    with np.errstate(all="ignore"):
+        for i in range(0, len(Zev), 2048):
+            corr = Zev[i:i + 2048] @ ref.T / m
+            _require_finite(corr, "matrix_profile")
+            best[i:i + 2048] = np.sqrt(np.maximum(2 * m * (1 - corr.max(1)), 0.0))
     best[flat] = 0.0                       # a constant subsequence has no shape to compare
     return _scatter(len(Fev), idx, best)
 
