@@ -68,3 +68,10 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * Correction in Related Work: TSB-AD detector count (the README claims 40 but lists 33).
 * Tests: 107 pass (27 new). Not yet run on GB or ERCOT; no result from these detectors may be quoted until that run exists.
 * Design doc: `docs/BENCHMARK_PLAN.md`.
+
+## Step 7b, 2 Nov 2026: intervals for AUC-PR / VUS-PR, per-event coverage table, parameter-free note
+* `equal_budget_tuning.py` now writes `<out>_ci_metrics.csv` (paired 7-day-block bootstrap of AUC-PR and VUS-PR for every detector, difference to the best, `reliably_worse_than_best`; `--ci-metrics`, `--n-boot-vus`, VUS is about 10x slower per replicate so it defaults to 100) and `<out>_coverage.csv` (per-event coverage by detector, `events_hit`, `min_event_coverage`, mean event/timestamp recall). Logic lives in `ebench/report.py` (tested).
+* Parameter-free detectors (`diff_z`, `seasonal_naive`) print `INFO ... nothing to tune` instead of the misleading "validation cannot separate configs" note; trials CSV has a `parameter_free` column; the summary shows "n/a (parameter-free)".
+* `experiments/summarise_real_results.py` takes `--dir`, `--suffix`, `--out` and adds the coverage table and the interval tables (F1, AUC-PR, VUS-PR) per dataset.
+* Caveats stated in the code and the summary: the "best" detector is chosen post hoc among those listed; VUS-PR is our re-implementation; bootstrap replicates of a range metric can contain block seams.
+* Tests: 116 pass (9 new, including one that runs the CLI end to end).

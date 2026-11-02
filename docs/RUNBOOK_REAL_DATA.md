@@ -47,3 +47,7 @@ FEATURES=resid FAMS="isolation_forest knn_inductive rolling_z diff_z seasonal_na
 pip3 install stumpy TSB-AD && python3 experiments/crosscheck_official.py
 ```
 Read `<out>_ci.csv`: a family is only "better" if the others have `reliably_worse_than_best = True`.
+
+Step 7b outputs per dataset: `<out>_ci.csv` (F1), `<out>_ci_metrics.csv` (AUC-PR, VUS-PR), `<out>_coverage.csv`. Summarise a dated run folder with
+`python3 experiments/summarise_real_results.py --dir results/real_data/2026-11-02_stronger --suffix _resid --out docs/summary_2026-11-02_stronger.md`
+(the runner writes `_resid` into file names when `FEATURES=resid`).

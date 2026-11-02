@@ -25,7 +25,8 @@ from ebench import (timestamp_level_prf, event_level_prf, per_event_coverage, au
                     paired_block_bootstrap, summarise_paired)
 from ebench.synthetic import resample
 from ebench.detectors import top_pct_flag
-from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series, make_validation_suite
+from ebench.tuning import FAMILIES, equal_budget_search, inject_into_series, make_validation_suite, is_parameter_free
+from ebench.report import coverage_table, metric_intervals
 from real_resolution_ablation import build_features, feature_cols
 
 
@@ -102,7 +103,9 @@ def main(a):
         d.columns = [f"{r.type[:5]}{int(r.duration_days)}d" if r.type != "pulse" else "pulse" for r in cell_tbl.itertuples()]
         print(d.to_string())
     for fam_name, ok in trials.groupby("family").informative.first().items():
-        if not ok:
+        if is_parameter_free(fam_name):
+            print(f"INFO {fam_name}: parameter-free, nothing to tune; 'tuned' == 'default' by construction")
+        elif not ok:
             print(f"NOTE {fam_name}: validation cannot separate its configs or sees no signal "
                   f"(see lifts above); the default config is used, 'tuned' == 'default' for this family")
 
@@ -139,6 +142,10 @@ def main(a):
         rows.append(r)
     res = pd.DataFrame(rows)
     res.to_csv(a.out + "_final.csv", index=False)
+    cov_tbl = coverage_table(res)
+    cov_tbl.to_csv(a.out + "_coverage.csv", index=False)
+    print("per-event coverage (share of each event's timestamps flagged; mean over seeds):")
+    print(cov_tbl.round(3).to_string(index=False))
     agg = res.groupby(["family", "config"])[["auc_pr", "ts_f1", "ev_f1"] + [c for c in res if c.startswith("cov_")]].agg(["mean", "std"]).round(3)
     pd.set_option("display.width", 250); print(agg)
 
@@ -162,6 +169,23 @@ def main(a):
         ci_df.to_csv(a.out + "_ci.csv", index=False)
         print(f"paired {a.ci_block}-block bootstrap, {a.n_boot} replicates (seed-averaged ts_f1):")
         print(ci_df[["detector", "ts_f1", "ts_f1_lo", "ts_f1_hi", "reliably_worse_than_best"]].round(3).to_string(index=False))
+
+        # threshold-free metrics, same blocks, same detectors (AUC-PR; VUS-PR with a buffer fixed from the data)
+        groups = {}
+        for (name, tag, seed), sc in score_store.items():
+            if tag == "tuned" and chosen[name] == FAMILIES[name]["default"]:
+                continue
+            groups.setdefault(f"{name}|{tag}", []).append(sc[common])
+        parts = []
+        for m in a.ci_metrics:
+            nb = a.n_boot_vus if m == "vus_pr" else a.n_boot
+            parts.append(metric_intervals(tc, yc, groups, m, n_boot=nb, seed=a.seed, block=a.ci_block))
+        if parts:
+            mi = pd.concat(parts, ignore_index=True)
+            mi.to_csv(a.out + "_ci_metrics.csv", index=False)
+            for m, d in mi.groupby("metric", sort=False):
+                print(f"{m}: paired {a.ci_block}-block bootstrap, {int(d.n_boot.iloc[0])} replicates (mean over seeds):")
+                print(d[["detector", "point", "lo", "hi", "reliably_worse_than_best"]].round(3).to_string(index=False))
 
 
 if __name__ == "__main__":
@@ -188,6 +212,10 @@ if __name__ == "__main__":
     ap.add_argument("--min-lift", type=float, default=1.3, help="taxonomy: min best macro lift to count as informative")
     ap.add_argument("--n-boot", type=int, default=200, help="paired block-bootstrap replicates for ts_f1 (0 = off)")
     ap.add_argument("--ci-block", default="7D", help="bootstrap block (pandas offset)")
+    ap.add_argument("--ci-metrics", nargs="*", default=["auc_pr", "vus_pr"], choices=["auc_pr", "vus_pr"],
+                    help="threshold-free metrics that also get paired intervals (written to <out>_ci_metrics.csv)")
+    ap.add_argument("--n-boot-vus", type=int, default=100,
+                    help="bootstrap replicates for vus_pr (it is ~10x slower per replicate than auc_pr)")
     ap.add_argument("--val-durations", type=int, nargs="+", default=[1, 3])
     ap.add_argument("--val-prevalence", type=float, default=0.08)
     ap.add_argument("--val-magnitude", type=float, default=3.0)

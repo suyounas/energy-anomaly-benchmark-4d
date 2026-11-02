@@ -3,11 +3,15 @@
 Every number in docs/real_data_summary.md is read from those CSVs, so the paper's text can cite
 the file instead of copying numbers by hand.   python experiments/summarise_real_results.py
 """
-import os, sys
+import argparse, os, sys
 import pandas as pd
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+from ebench.report import coverage_table
 
 D = os.path.join(os.path.dirname(__file__), "..", "results", "real_data")
 OUT = os.path.join(os.path.dirname(__file__), "..", "docs", "real_data_summary.md")
+SUFFIX = ""          # e.g. "_resid" for files named gb_equal_budget_resid_final.csv
 
 
 def md(df):
@@ -18,22 +22,25 @@ def md(df):
 
 
 def equal_budget(ds):
-    f = pd.read_csv(f"{D}/{ds}_equal_budget_final.csv")
+    f = pd.read_csv(f"{D}/{ds}_equal_budget{SUFFIX}_final.csv")
     cov = [c for c in f.columns if c.startswith("cov_")]
     g = f.groupby(["family", "config"])
     t = g[["auc_pr", "ts_f1", "ev_f1"]].mean().round(3).join(g.ts_f1.std().round(3).rename("ts_f1_sd"))
     t = t.join(g[cov].mean().round(3)).reset_index()
     t.insert(2, "auc_pr_lift", (g.auc_pr.mean() / g.prevalence.first()).round(2).values)
-    tr = pd.read_csv(f"{D}/{ds}_equal_budget_trials.csv")
+    tr = pd.read_csv(f"{D}/{ds}_equal_budget{SUFFIX}_trials.csv")
     if "val_macro_lift" in tr.columns:            # taxonomy suite: select on macro lift (1 = chance)
         v = tr.groupby("family").agg(val_min=("val_macro_lift", "min"), val_max=("val_macro_lift", "max")).round(3)
         v["val_spread"] = (v.val_max - v.val_min).round(3)
         v["selection_informative"] = (v.val_spread >= 0.1) & (v.val_max >= 1.3)
+        if "parameter_free" in tr.columns:        # nothing to select: do not report it as 'not informative'
+            pf = tr.groupby("family").parameter_free.first()
+            v["selection_informative"] = [("n/a (parameter-free)" if pf[i] else bool(x)) for i, x in v.selection_informative.items()]
     else:                                         # legacy suite: validation AUC-PR
         v = tr.groupby("family").agg(val_min=("val_auc_pr", "min"), val_max=("val_auc_pr", "max")).round(3)
         v["val_spread"] = (v.val_max - v.val_min).round(3)
         v["selection_informative"] = v.val_spread >= 0.02
-    return t, v.reset_index(), float(f.prevalence.iloc[0]), int(f.seed.nunique())
+    return t, v.reset_index(), float(f.prevalence.iloc[0]), int(f.seed.nunique()), coverage_table(f)
 
 
 def main():
@@ -41,26 +48,52 @@ def main():
            "Do not edit by hand. Inputs: `results/real_data/*.csv`. Features are re-derived by `ebench`, so these",
            "numbers do not reproduce the earlier tables; the paper must say which pipeline produced which number.", ""]
     for ds, name in (("gb", "GB (NESO), 1 h resolution"), ("ercot", "ERCOT (EIA), hourly")):
-        t, v, prev, n = equal_budget(ds)
+        if not os.path.exists(f"{D}/{ds}_equal_budget{SUFFIX}_final.csv"):
+            continue
+        t, v, prev, n, cov = equal_budget(ds)
         out += [f"## Equal-budget tuning: {name}", f"Test prevalence {prev:.4f}; {n} seeds; mean over seeds.", "", md(t), "",
                 "Validation (injected events) AUC-PR across all configs per family. `selection_informative = False` means "
                 "the validation set could not separate configs, so tuning there is selection on noise. These runs predate the "
                 "rule that keeps the default config in that case, so their `tuned` rows for such families are noise-selected "
                 "and must be read as `default`:", "", md(v), ""]
+        covc = [c for c in cov.columns if c.startswith("cov_")]
+        out += [f"### Per-event coverage: {name}",
+                "Share of each labelled event's timestamps that carry a flag (mean over seeds). `events_hit` counts events "
+                "with any flag at all, so a detector can hit an event with very low coverage; read both.", "",
+                md(cov.round(3)), ""]
+        for fn, title, cols in ((f"{ds}_equal_budget{SUFFIX}_ci.csv", "timestamp F1", ["detector", "ts_f1", "ts_f1_lo", "ts_f1_hi", "best", "reliably_worse_than_best"]),
+                                (f"{ds}_equal_budget{SUFFIX}_ci_metrics.csv", "AUC-PR and VUS-PR", ["metric", "detector", "point", "lo", "hi", "best", "reliably_worse_than_best"])):
+            if os.path.exists(f"{D}/{fn}"):
+                ci = pd.read_csv(f"{D}/{fn}")
+                out += [f"### Paired block-bootstrap intervals, {title}: {name}",
+                        "Same resampled rows for every detector; `reliably_worse_than_best` means the interval of the "
+                        "difference to the best point estimate is entirely below 0. The best is chosen post hoc among the "
+                        "listed detectors, so read this as exploratory. VUS-PR here is our re-implementation "
+                        "(`ebench/rangemetrics.py`); its replicates can contain block seams.", "",
+                        md(ci[[c for c in cols if c in ci.columns]].round(3)), ""]
     for ds, name in (("gb", "GB"), ("ercot", "ERCOT")):
+        if not os.path.exists(f"{D}/{ds}_resolution_ablation.csv"):
+            continue
         a = pd.read_csv(f"{D}/{ds}_resolution_ablation.csv")
         cols = ["factor", "resolution_min", "detector", "alert_rate", "f1_ceiling", "ts_f1", "auc_pr_lift", "ev_f1"]
         out += [f"## Resolution ablation: {name}", "", md(a[cols].round(3)), ""]
-    tt = pd.read_csv(f"{D}/ercot_tiers.csv")
+    tt = pd.read_csv(f"{D}/ercot_tiers.csv") if os.path.exists(f"{D}/ercot_tiers.csv") else None
     cols = ["protocol", "detector", "n_flags", "share_flags_in_tier2", "share_flags_jul_sep_2023",
             "share_flags_outside_labels", "tier1_f1", "tier1_f1_lo", "tier1_f1_hi",
             "tier1_plus_tier2_f1", "tier1_plus_tier2_f1_lo", "tier1_plus_tier2_f1_hi"]
-    out += ["## ERCOT label tiers", "Tier 2 (27 Jun-10 Aug 2023) is post hoc: sensitivity analysis only.", "",
-            md(tt[[c for c in cols if c in tt.columns]].round(3)), ""]
+    if tt is not None:
+        out += ["## ERCOT label tiers", "Tier 2 (27 Jun-10 Aug 2023) is post hoc: sensitivity analysis only.", "",
+                md(tt[[c for c in cols if c in tt.columns]].round(3)), ""]
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     open(OUT, "w").write("\n".join(out))
     print("wrote", os.path.relpath(OUT))
 
 
 if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dir", default=D, help="folder with the *_equal_budget*.csv files")
+    ap.add_argument("--suffix", default="", help="file-name suffix before _final/_trials/_ci, e.g. _resid")
+    ap.add_argument("--out", default=OUT)
+    a = ap.parse_args()
+    D, SUFFIX, OUT = a.dir, a.suffix, a.out
     main()

@@ -77,6 +77,11 @@ from .stronger import STRONGER   # noqa: E402  (registered after FAMILIES is def
 FAMILIES.update(STRONGER)
 
 
+def is_parameter_free(name):
+    """Families with nothing to tune (their search space is the placeholder {'_': [0]})."""
+    return list(FAMILIES[name]["space"]) == ["_"]
+
+
 def sample_configs(space, n, rng):
     keys = list(space)
     seen, out, tries = set(), [], 0
@@ -230,5 +235,5 @@ def equal_budget_search(families, Ftr, Fval, yval, cols, n_trials=8, seed=0, spd
         informative = spread >= min_spread and (cells is None or float(np.nanmax(vals)) >= min_lift)
         chosen[name] = best[1] if informative else fam["default"]
         for r in rows[start:]:
-            r["val_spread"] = spread; r["informative"] = informative
+            r["val_spread"] = spread; r["informative"] = informative; r["parameter_free"] = is_parameter_free(name)
     return pd.DataFrame(rows), chosen
