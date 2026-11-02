@@ -101,3 +101,53 @@ def test_cli_writes_coverage_and_metric_intervals_and_prints_info_not_note(tmp_p
     mi = pd.read_csv(str(out) + "_ci_metrics.csv")
     assert set(mi.metric) == {"auc_pr", "vus_pr"} and mi.point.notna().all()
     assert "auc_pr: paired 7D-block bootstrap" in r.stdout
+
+
+def _two_event_series(n_days=730):
+    import numpy as np, pandas as pd
+    t = pd.date_range("2020-01-01", periods=24 * n_days, freq="h")
+    y = np.zeros(len(t), int)
+    y[24 * 300:24 * 370] = 1
+    y[24 * 560:24 * 569] = 1
+    return t, y
+
+
+def test_vus_interval_contains_point_for_random_and_good_scorers():
+    import numpy as np
+    from ebench.report import metric_intervals
+    t, y = _two_event_series()
+    rng = np.random.default_rng(0)
+    g = {f"rand{i}": [rng.normal(size=len(t))] for i in range(3)}
+    g["good"] = [rng.normal(size=len(t)) + 2 * y]
+    d = metric_intervals(t, y, g, "vus_pr", n_boot=60)
+    assert ((d.point >= d.lo) & (d.point <= d.hi)).all(), d[["detector", "point", "lo", "hi"]]
+
+
+def test_event_units_keep_events_whole_and_partition_rows():
+    import numpy as np
+    from ebench.report import event_units
+    t, y = _two_event_series()
+    units = event_units(t, y, margin_rows=100)
+    allidx = np.concatenate(units)
+    assert sorted(allidx.tolist()) == list(range(len(y)))                  # a partition
+    for s, e in ((24 * 300, 24 * 370 - 1), (24 * 560, 24 * 569 - 1)):
+        owner = {k for k, u in enumerate(units) if s in set(u.tolist())}
+        assert len(owner) == 1
+        k = owner.pop()
+        u = set(units[k].tolist())
+        assert all(i in u for i in range(s - 100, e + 101))               # event plus margin in one unit
+
+
+def test_segmentwise_point_equals_plain_vus():
+    import numpy as np
+    from ebench.report import event_units
+    from ebench.rangemetrics import vus_pr
+    t, y = _two_event_series()
+    rng = np.random.default_rng(1)
+    sc = rng.normal(size=len(t)) + y
+    mb = 300
+    units = event_units(t, y, margin_rows=mb // 2 + 1)
+    seg = np.zeros(len(y), int)
+    for j, u in enumerate(units):
+        seg[u] = j
+    assert abs(vus_pr(y, sc, max_buffer=mb, n_buffers=5, segments=seg) - vus_pr(y, sc, max_buffer=mb, n_buffers=5)) < 1e-12

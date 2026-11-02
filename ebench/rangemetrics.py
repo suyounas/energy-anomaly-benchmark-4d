@@ -19,6 +19,8 @@ Definition used
   * range_auc_pr = step-wise average precision over the recall axis (sklearn-style; the official
     code integrates trapezoidally -- a small, known difference).
   * vus_pr = mean of range_auc_pr over buffers 0, ..., max_buffer (n_buffers values).
+  * `segments` (optional id per row): ramps, ranges and the existence reward never cross a segment
+    boundary.  Used by the bootstrap, whose replicates glue unrelated stretches of the series together.
 """
 from __future__ import annotations
 import numpy as np
@@ -30,35 +32,58 @@ def _runs(y):
     return list(zip(np.where(d == 1)[0], np.where(d == -1)[0] - 1))
 
 
-def soft_labels(y, buffer):
-    lab = np.asarray(y, float).copy()
-    n, h = len(lab), int(buffer) // 2
-    runs = _runs(y)
-    if h > 0:
-        d = np.arange(1, h + 1)
-        w = np.sqrt(1 - d / (h + 1))
-        for s, e in runs:
-            for pos, ok in ((s - d, s - d >= 0), (e + d, e + d < n)):
-                lab[pos[ok]] = np.maximum(lab[pos[ok]], w[ok])
-    return lab, runs
+def _segment_bounds(n, segments):
+    """[(start, stop)) of the contiguous stretches of equal segment id (the whole series if None)."""
+    if segments is None:
+        return [(0, n)]
+    seg = np.asarray(segments)
+    cut = np.r_[0, np.where(seg[1:] != seg[:-1])[0] + 1, n]
+    return list(zip(cut[:-1], cut[1:]))
 
 
-def range_auc_pr(y_true, score, buffer=0):
+def _labels_and_ranges(y, buffer, segments=None):
+    """Soft labels and, per labelled range, (s, e, lo, hi): the range and the span its buffer may touch.
+    With `segments` (an id per row) ramps and ranges never cross a segment boundary, so rows that were
+    glued together by a resampling procedure do not influence each other."""
+    y = np.asarray(y).astype(int)
+    lab = y.astype(float)
+    h = int(buffer) // 2
+    ranges = []
+    for a, b in _segment_bounds(len(y), segments):
+        for s, e in _runs(y[a:b]):
+            s, e = s + a, e + a
+            lo, hi = max(s - h, a), min(e + h, b - 1)
+            ranges.append((s, e, lo, hi))
+            if h > 0:
+                d = np.arange(1, h + 1)
+                w = np.sqrt(1 - d / (h + 1))
+                for pos in (s - d, e + d):
+                    ok = (pos >= a) & (pos < b)
+                    lab[pos[ok]] = np.maximum(lab[pos[ok]], w[ok])
+    return lab, ranges
+
+
+def soft_labels(y, buffer, segments=None):
+    lab, ranges = _labels_and_ranges(y, buffer, segments)
+    return lab, [(s, e) for s, e, _, _ in ranges]
+
+
+def range_auc_pr(y_true, score, buffer=0, segments=None):
     y = np.asarray(y_true).astype(int)
     if y.sum() == 0 or y.sum() == len(y):
         return float("nan")
     sc = np.asarray(score, float)
     fin = np.isfinite(sc)
     sc = np.where(fin, sc, (sc[fin].min() - 1.0) if fin.any() else 0.0)     # NaN scores rank last
-    lab, runs = soft_labels(y, buffer)
-    n, h = len(y), int(buffer) // 2
+    lab, ranges = _labels_and_ranges(y, buffer, segments)
+    n = len(y)
     order = np.argsort(-sc, kind="stable")
     ss = sc[order]
     last = np.r_[np.where(np.diff(ss) != 0)[0], n - 1]          # end of each tie group
     tp = np.cumsum(lab[order])[last]
     npred = (np.arange(n) + 1)[last]
     thr = ss[last]
-    mx = np.sort([sc[max(s - h, 0): e + h + 1].max() for s, e in runs])
+    mx = np.sort([sc[lo: hi + 1].max() for _, _, lo, hi in ranges])
     exist = (len(mx) - np.searchsorted(mx, thr, side="left")) / len(mx)
     prec = tp / npred
     rec = tp / lab.sum() * exist
@@ -66,7 +91,7 @@ def range_auc_pr(y_true, score, buffer=0):
     return float(np.sum(np.maximum(rec - rec_prev, 0.0) * prec))
 
 
-def vus_pr(y_true, score, max_buffer=None, n_buffers=11):
+def vus_pr(y_true, score, max_buffer=None, n_buffers=11, segments=None):
     """Volume under the range-PR surface: mean range_auc_pr over buffers 0..max_buffer.
     max_buffer defaults to the median labelled-range length (clipped to [2, n//10])."""
     y = np.asarray(y_true).astype(int)
@@ -77,4 +102,4 @@ def vus_pr(y_true, score, max_buffer=None, n_buffers=11):
         med = int(np.median([e - s + 1 for s, e in runs]))
         max_buffer = int(np.clip(med, 2, max(2, len(y) // 10)))
     bufs = np.unique(np.linspace(0, max_buffer, n_buffers).astype(int))
-    return float(np.mean([range_auc_pr(y, score, b) for b in bufs]))
+    return float(np.mean([range_auc_pr(y, score, b, segments) for b in bufs]))

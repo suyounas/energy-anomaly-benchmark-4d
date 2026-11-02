@@ -66,3 +66,20 @@ def test_nan_scores_rank_last_and_nan_only_for_degenerate_labels():
 def test_ties_do_not_inflate():
     y = two_events()
     assert range_auc_pr(y, np.zeros(len(y))) == pytest.approx(y.mean(), abs=0.05)
+
+
+def test_segments_isolate_ramps_and_events():
+    import numpy as np
+    from ebench.rangemetrics import range_auc_pr, soft_labels
+    y = np.zeros(60, int); y[10:14] = 1; y[40:44] = 1
+    seg = np.r_[np.zeros(30, int), np.ones(30, int)]
+    # a single segment reproduces the unsegmented result exactly
+    assert soft_labels(y, 8)[0].tolist() == soft_labels(y, 8, np.zeros(60, int))[0].tolist()
+    # an event at the very start of a segment gets no ramp into the previous segment
+    y2 = np.zeros(60, int); y2[30:34] = 1
+    lab, _ = soft_labels(y2, 8, seg)
+    assert lab[:30].sum() == 0 and lab[30:34].min() == 1 and lab[34:38].max() > 0
+    lab_unseg, _ = soft_labels(y2, 8)
+    assert lab_unseg[:30].sum() > 0
+    s = np.random.default_rng(0).normal(size=60)
+    assert range_auc_pr(y, s, 8, np.zeros(60, int)) == range_auc_pr(y, s, 8)

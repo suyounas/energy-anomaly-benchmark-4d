@@ -53,9 +53,9 @@ def main():
         t, v, prev, n, cov = equal_budget(ds)
         out += [f"## Equal-budget tuning: {name}", f"Test prevalence {prev:.4f}; {n} seeds; mean over seeds.", "", md(t), "",
                 "Validation (injected events) AUC-PR across all configs per family. `selection_informative = False` means "
-                "the validation set could not separate configs, so tuning there is selection on noise. These runs predate the "
-                "rule that keeps the default config in that case, so their `tuned` rows for such families are noise-selected "
-                "and must be read as `default`:", "", md(v), ""]
+                "the validation set could not separate configs, so tuning there would be selection on noise; the pipeline then "
+                "keeps the default config (`tuned` == `default`). Runs made before 29 Oct 2026 predate this rule: read their "
+                "`tuned` rows for such families as `default`:", "", md(v), ""]
         covc = [c for c in cov.columns if c.startswith("cov_")]
         out += [f"### Per-event coverage: {name}",
                 "Share of each labelled event's timestamps that carry a flag (mean over seeds). `events_hit` counts events "
