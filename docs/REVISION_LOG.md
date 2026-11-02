@@ -1,4 +1,4 @@
-# Revision log: changes
+# Revision log
 
 Status of each item in the 18-row issue list. **Done** = implemented and tested here.
 **Partial** = implemented, but needs runs on real data / GPU that the authoring sandbox could not do.
@@ -24,7 +24,7 @@ Status of each item in the 18-row issue list. **Done** = implemented and tested 
 | 17 | CMA-ES tuned on test set | Partial | Disclosed in Limitations; validation-split tuning implemented. The CMA-ES search itself was not re-run; the BayesAI poster must carry the caveat. |
 | 18 | Protocol B window seam | Partial | `ebench.windows.make_windows` never spans a gap (tested). Study scripts unchanged; neural numbers not regenerated. |
 
-## Additional findings made during the revision
+## Additional findings made during the revision 
 * Isolation Forest, the sequence models and the `|return|` score flag exactly 5% of the test set; **DBSCAN flags whatever its noise set is** (fitted on the test set), so its alert rate floats (11–24% in the sweep).
 * In Studies 2–4 the "rolling z-score" is `|return| > its 95th percentile on test`, not a rolling z > 3 as described in the earlier paper.
 * The tuned-eps DBSCAN of Study 1 exists only in a diagnostics script; the main pipeline uses a guessed eps = 1.5.
@@ -67,7 +67,7 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * New `ebench/rangemetrics.py`: `range_auc_pr`, `vus_pr` (own re-implementation of the published definition; `experiments/crosscheck_official.py` compares with stumpy and TSB-AD on a machine that can install them).
 * Correction in Related Work: TSB-AD detector count (the README claims 40 but lists 33).
 * Tests: 107 pass (27 new). Not yet run on GB or ERCOT; no result from these detectors may be quoted until that run exists.
-* Design doc: `docs/BENCHMARK_PLAN.md`.
+* Design doc: `docs/BENCHMARK_PLAN.md` (evaluation audit, verified sources, steps 8 and 9).
 
 ## Step 7b, 2 Nov 2026: intervals for AUC-PR / VUS-PR, per-event coverage table, parameter-free note
 * `equal_budget_tuning.py` now writes `<out>_ci_metrics.csv` (paired 7-day-block bootstrap of AUC-PR and VUS-PR for every detector, difference to the best, `reliably_worse_than_best`; `--ci-metrics`, `--n-boot-vus`, VUS is about 10x slower per replicate so it defaults to 100) and `<out>_coverage.csv` (per-event coverage by detector, `events_hit`, `min_event_coverage`, mean event/timestamp recall). Logic lives in `ebench/report.py` (tested).
@@ -95,3 +95,8 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * Pre-registered (`docs/STEP9_PREREGISTRATION.md`), then run: 648 semi-synthetic datasets, 9 detectors x 2 feature sets. New `ebench/factorial.py` (generator, balanced-design sum-of-squares decomposition, ranking stability), `experiments/factor_attribution.py` (`run` / `analyse`, `--quick` for smoke tests), `tests/test_factorial.py`.
 * Result in `docs/STEP9_RESULT.md`: detector main effect 19.9% of variance, detector x setting interactions about 26%, global-best detector wins 56% of conditions. Detector rankings are conditional on event type, duration and magnitude.
 * Caveat recorded: the synthetic backgrounds favour a seasonal-naive residual.
+
+## Paper rewrite and label-validity analysis, 2 Nov 2026
+* Paper (`paper/revised/main.tex`) rewritten: positioning against TSB-AD, TimeEval, Wu and Keogh and the survey; data structure table; label provenance and validity; full protocol; attribution (step 9); real-data comparison with stronger baselines and intervals (neural Colab runs of 2 Nov 2026 added under `results/real_data/2026-11-02_stronger_neural/`); held-out public test (step 8). `make_tables.py` generates the new tables; `tests/test_paper_numbers.py` guards the quoted numbers.
+* New `ebench/labelsens.py` and `experiments/label_sensitivity.py` (detector-independent label checks and label-perturbation rankings); 6 tests. Not yet run on the real series.
+* The VUS-PR rows of `*_ci_metrics.csv` in the neural result folder are invalid (see README there); the paper does not use them.

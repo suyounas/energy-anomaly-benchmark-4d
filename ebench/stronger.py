@@ -1,4 +1,4 @@
-"""Stronger and simpler comparison detectors.
+"""Stronger and simpler comparison detectors (Wu & Keogh; TimeEval; TSB-UAD / TSB-AD).
 
 Why these.  The benchmark literature (Wu & Keogh 2023; Schmidl et al. 2022; Paparrizos et al. 2022;
 Liu & Paparrizos 2024) reports that simple and distance-based methods are often as good as deep

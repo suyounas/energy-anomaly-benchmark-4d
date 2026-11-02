@@ -108,5 +108,96 @@ for tag in ("shift", "burst"):
     zz = S[(S.detector == "z_rolling") & (S.resolution == "1d")][["duration", "ts_f1_mean", "auc_pr_mean"]]
     facts[f"{tag}|z_rolling_1d_res"] = zz.round(3).to_dict("records")
     facts[f"{tag}|n_runs"] = int(raw.shape[0]); facts[f"{tag}|n_seeds"] = int(raw.seed.nunique())
+
+# ---------------------------------------------------------------- real-data equal-budget tables (stronger baselines, intervals)
+import sys
+sys.path.insert(0, ".")
+from ebench.report import coverage_table
+from ebench.factorial import ss_decomposition
+from ebench.crossseries import stratified_partial_spearman
+NEW = f"{R}/real_data/2026-11-02_stronger_neural"
+DET = [("matrix_profile", "Matrix profile"), ("seasonal_naive", "Seasonal-naive resid."), ("lstm_ae", "LSTM-AE"), ("transformer", "Transformer"),
+       ("window_pca", "Window PCA"), ("isolation_forest", "Isolation Forest"), ("window_iforest", "Window IForest"),
+       ("knn_inductive", "kNN-to-train"), ("window_knn", "Window kNN"), ("diff_z", "$|\\Delta x|$ one-liner"),
+       ("rolling_z", "Rolling $z$"), ("spectral_residual", "Spectral residual")]
+def iv(p, lo, hi): return f"{p:.3f} [{lo:.3f}, {hi:.3f}]"
+def real_table(ds, title_ev):
+    fr = {sfx: pd.read_csv(f"{NEW}/{ds}_equal_budget{sfx}_final.csv") for sfx in ("", "_resid")}
+    ci = {sfx: pd.read_csv(f"{NEW}/{ds}_equal_budget{sfx}_ci.csv").set_index("detector") for sfx in ("", "_resid")}
+    cm = pd.read_csv(f"{NEW}/{ds}_equal_budget_ci_metrics.csv"); cm = cm[cm.metric == "auc_pr"].set_index("detector")
+    prev = float(fr[""].prevalence.iloc[0])
+    L = []
+    for fam, nm in DET:
+        cells = []
+        for sfx in ("", "_resid"):
+            f = fr[sfx]; d = f[(f.family == fam) & (f.config == "default")]
+            if d.empty:
+                cells += ["--", "--"]; continue
+            ap = d.auc_pr.mean(); k = f"{fam}|default"
+            if sfx == "" and k in cm.index:
+                a = iv(cm.loc[k, "point"], cm.loc[k, "lo"], cm.loc[k, "hi"])
+            else:
+                a = f"{ap:.3f}"
+            f1 = iv(ci[sfx].loc[k, "ts_f1"], ci[sfx].loc[k, "ts_f1_lo"], ci[sfx].loc[k, "ts_f1_hi"]) if k in ci[sfx].index else f"{d.ts_f1.mean():.3f}"
+            cells += [a, f1 + ("$^\\ast$" if k in ci[sfx].index and bool(ci[sfx].loc[k, "reliably_worse_than_best"]) else "")]
+            facts[f"{ds}|{fam}|{'resid' if sfx else 'recipe'}|auc_pr"] = float(ap); facts[f"{ds}|{fam}|{'resid' if sfx else 'recipe'}|ts_f1"] = float(d.ts_f1.mean())
+        L.append(f"{nm} & " + " & ".join(cells) + " \\\\")
+    facts[f"{ds}|prevalence"] = prev
+    head = ("\\begin{tabular}{lcccc}\n\\toprule\n & \\multicolumn{2}{c}{4-feature recipe} & \\multicolumn{2}{c}{recipe + seasonal residual} \\\\\n"
+            "Detector & AUC-PR [95\\%] & F1 [95\\%] & AUC-PR & F1 [95\\%] \\\\\n\\midrule\n")
+    open(f"{T}/real_{ds}.tex", "w").write(head + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
+real_table("gb", ""); real_table("ercot", "")
+# per-event coverage (residual feature set), default configs
+for ds in ("gb", "ercot"):
+    f = pd.read_csv(f"{NEW}/{ds}_equal_budget_resid_final.csv"); f = f[f.config == "default"]
+    ct = coverage_table(f).set_index("family"); cov = [c for c in ct.columns if c.startswith("cov_")]
+    L = []
+    for fam, nm in DET:
+        if fam in ct.index:
+            L.append(f"{nm} & " + " & ".join(f"{ct.loc[fam, c]:.2f}" for c in cov) + f" & {int(ct.loc[fam, 'events_hit'])}/{int(ct.loc[fam, 'n_events'])} \\\\")
+            for c in cov: facts[f"{ds}|{fam}|{c}"] = float(ct.loc[fam, c])
+    names = " & ".join(c[4:].replace("Texas Freeze", "Texas Freeze").replace("_", " ") for c in cov)
+    open(f"{T}/coverage_{ds}.tex", "w").write("\\begin{tabular}{l" + "c" * (len(cov) + 1) + "}\n\\toprule\nDetector & " + names + " & Events hit \\\\\n\\midrule\n" + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
+
+# ---------------------------------------------------------------- factorial attribution (step 9)
+G = f"{R}/factorial/grid.csv"
+if os.path.exists(G):
+    g = pd.read_csv(G)
+    FACT = ["background", "event", "dur_h", "mag", "res_h", "features", "detector"]
+    ssd = ss_decomposition(g, FACT, "skill", max_order=2)
+    nice = {"detector": "Detector (main effect)", "event": "Event type", "dur_h x detector": "Duration $\\times$ detector", "event x detector": "Event type $\\times$ detector",
+            "event x dur_h": "Event type $\\times$ duration", "mag": "Magnitude", "mag x detector": "Magnitude $\\times$ detector", "res_h x detector": "Resolution $\\times$ detector",
+            "features x detector": "Feature set $\\times$ detector", "background x detector": "Background $\\times$ detector"}
+    L = []
+    for k, v in nice.items():
+        sh = float(ssd.loc[ssd.term == k, "share"].iloc[0]) * 100; facts[f"factorial|{k}"] = sh
+        L.append(f"{v} & {sh:.1f} \\\\")
+    rs = float(ssd.loc[ssd.term.str.startswith("residual"), "share"].iloc[0]) * 100; facts["factorial|residual"] = rs
+    L.append(f"Remainder (higher-order terms, replicate noise) & {rs:.1f} \\\\")
+    det_all = float(ssd.loc[ssd.term.str.contains("detector"), "share"].sum()) * 100; facts["factorial|detector_all"] = det_all
+    facts["factorial|n_datasets"] = int(g[["background", "event", "dur_h", "mag", "res_h", "rep"]].drop_duplicates().shape[0])
+    open(f"{T}/factorial.tex", "w").write("\\begin{tabular}{lr}\n\\toprule\nSource & \\% of variance in skill \\\\\n\\midrule\n" + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
+    wins = g.groupby(["background", "event", "dur_h", "mag", "res_h", "features", "detector"]).skill.mean().unstack("detector")
+    facts["factorial|global_best"] = wins.mean().idxmax(); facts["factorial|global_best_wins_share"] = float((wins.idxmax(axis=1) == wins.mean().idxmax()).mean())
+    ev_win = wins.idxmax(axis=1).reset_index(name="w").groupby("event").w.value_counts(normalize=True)
+    for ev in ("shift", "ramp", "burst"):
+        facts[f"factorial|win_share|{ev}|seasonal_naive"] = float(ev_win.get((ev, "seasonal_naive"), 0)); facts[f"factorial|win_share|{ev}|diff_z"] = float(ev_win.get((ev, "diff_z"), 0))
+
+# ---------------------------------------------------------------- public benchmark (step 8)
+P = f"{R}/public/tsbad_u.csv"
+if os.path.exists(P):
+    raw = pd.read_csv(P); ok = raw[raw.status == "ok"].copy()
+    ok["log_len"] = np.log(ok.median_len); ok["log_prev"] = np.log(ok.prevalence); ok["d"] = ok.auc_pr_window_pca - ok.auc_pr_knn_inductive
+    r_, lo_, hi_, per = stratified_partial_spearman(ok, "log_len", "d", "log_prev", n_boot=500, seed=0)
+    facts.update({"public|n_series": int(len(ok)), "public|n_datasets": int(ok.dataset.nunique()), "public|n_datasets_min8": int(len(per)),
+                  "public|rho": r_, "public|lo": lo_, "public|hi": hi_, "public|pca_beats_knn": float((ok.d > 0).mean()), "public|median_d": float(ok.d.median()),
+                  "public|n_excluded": int(len(raw) - len(ok))})
+    sens = []
+    for nm, sub in (("All series (primary)", ok), ("Clean training prefix only", ok[ok.train_contaminated == 0]), ("Event length $>3$ samples", ok[ok.median_len > 3]),
+                    ("Period found only", ok[ok.period_found == 1])):
+        a_, l_, h_, p_ = stratified_partial_spearman(sub, "log_len", "d", "log_prev", n_boot=500, seed=0)
+        sens.append(f"{nm} & {len(sub)} & {len(p_)} & {a_:.3f} & [{l_:.3f}, {h_:.3f}] \\\\")
+    open(f"{T}/public_sens.tex", "w").write("\\begin{tabular}{lrrrc}\n\\toprule\nSubset & Series & Datasets & $\\rho$ & 95\\% interval \\\\\n\\midrule\n" + "\n".join(sens) + "\n\\bottomrule\n\\end{tabular}\n")
+
 json.dump(facts, open(f"{OUT}/numbers.json", "w"), indent=1, default=float)
 print(json.dumps({k: v for k, v in facts.items() if "|" not in k or "corr" in k or "range" in k or "diff" in k}, indent=1, default=float)[:3500])

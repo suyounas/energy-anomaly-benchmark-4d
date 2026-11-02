@@ -3,10 +3,10 @@
 * `revised/` — the current manuscript (LaTeX, generic article class), generated tables and
   quoted numbers (`make_tables.py`, checked by `tests/test_paper_numbers.py`). **Use this.**
 * The markdown files in this folder (`00_unified_title_abstract.md`, `section8`–`section11`,
-  `draft_paper.md`) are the **earlier draft**. They are kept for history. After re-examination
+  `draft_paper.md`) are an **earlier draft**. They are kept for history. After re-examination
   the following statements in them are **superseded or unsupported**:
 
-| earlier statement | Where | Status |
+| Earlier statement | Where | Status |
 |---|---|---|
 | WTI DBSCAN F1 0.695 and "DBSCAN best on daily prices" | `00_unified_title_abstract.md`, `draft_paper.md`, `section9`, `section11` | Hybrid metric (day-level precision with event-level recall). Consistent same-day F1: DBSCAN 0.344, LSTM-AE 0.590. |
 | "Detection gap" (no method above F1 0.25 at ~100–3,500 samples) and the sample-count selection rule | `section11_four_dataset_synthesis.md` | Withdrawn: GB LSTM 0.282 and FR line flow 0.408 lie inside the range; rule never tested on held-out events. |

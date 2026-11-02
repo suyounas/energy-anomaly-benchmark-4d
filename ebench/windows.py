@@ -1,4 +1,4 @@
-"""Windowing that never spans a gap in the time axis."""
+"""Windowing that never spans a gap in the time axis (the Protocol-B seam)."""
 from __future__ import annotations
 
 import numpy as np

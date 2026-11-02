@@ -6,6 +6,7 @@ listed under "Primary test" is exploratory and will be labelled so in the paper.
 ## Claim under test (from the earlier paper, withdrawn in the revision)
 "The ranking of density-based and sequence-reconstruction detectors inverts as events span more native-resolution
 samples: density-based detectors lose ground, reconstruction detectors gain, as event length in samples grows."
+(Concern: only five events, confounded with dataset, domain, resolution, normalisation and event type.)
 
 ## Data
 TSB-AD-U (Liu and Paparrizos, NeurIPS 2024): about 1,070 labelled univariate series from 40 source datasets,

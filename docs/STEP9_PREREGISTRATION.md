@@ -3,7 +3,7 @@
 Written and committed before the factorial experiment is run. Nothing below is changed after seeing results; deviations go in `docs/STEP9_RESULT.md`.
 
 ## Question
-The concern is that sample count, resolution, dataset, domain, normalisation and event type are confounded, so no conclusion can be assigned to any one of them.
+Sample count, resolution, dataset, domain, normalisation and event type are confounded across real series, so no conclusion can be assigned to any one of them.
 On real data they cannot be separated. Here they are varied independently and fully crossed on semi-synthetic energy-like series with injected labelled events,
 so the share of outcome variance that belongs to each can be measured.
 

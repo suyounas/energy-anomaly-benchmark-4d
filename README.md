@@ -8,11 +8,11 @@ real commodity price time-series (WTI crude oil, Henry Hub natural gas).
 multi-node power grid data (national demand and cross-border transmission
 line flows), testing whether it generalises beyond univariate series.
 
-**Status:** public, under revision. An earlier four-page version has been superseded. The revised
-evaluation, tests and run-book are in `docs/REVISION_LOG.md`, the shared
-evaluation code in `ebench/`, and the revised manuscript in `paper/revised/`.
-The older markdown sections in `paper/` are the earlier draft and are
-superseded where `paper/README.md` says so.
+**Status:** public, under revision. An earlier four-page version has been
+superseded. The revised evaluation, tests and run-book are in
+`docs/REVISION_LOG.md`, the shared evaluation code in `ebench/`, and the
+revised manuscript in `paper/revised/`. The older markdown sections in
+`paper/` are an earlier draft and are superseded where `paper/README.md` says so.
 
 ---
 
@@ -200,4 +200,4 @@ tier sufficient) for PyTorch and unrestricted data download access.
 Sulman Younas Physics PhD (CERN ATLAS) [github.com/suyounas](https://github.com/suyounas) [medium.com/@sulmanyounas93](https://medium.com/@sulmanyounas93)
 
 ## Revision
-See `docs/REVISION_LOG.md` and `paper/revised/` (revised manuscript; tables are generated from the CSVs by `make_tables.py`). The shared evaluation code is in `ebench/`; controlled experiments are in `experiments/`.
+See `docs/REVISION_LOG.md` (status of each item, run-book) and `paper/revised/` (revised manuscript; tables are generated from the CSVs by `make_tables.py`). The shared evaluation code is in `ebench/`; controlled experiments are in `experiments/`.

@@ -109,7 +109,7 @@ def f1_ceiling_at_budget(prevalence, budget):
     """Best timestamp-level F1 ANY detector can reach when it must flag exactly a fraction
     `budget` of the test set and the anomaly prevalence is `prevalence`:
         F1_max = 2*min(pi, b) / (pi + b).
-    a fixed top-5% alert budget makes F1 depend on prevalence alone."""
+    A fixed top-5% alert budget makes F1 depend on prevalence alone."""
     pi, b = float(prevalence), float(budget)
     return 2 * min(pi, b) / (pi + b)
 

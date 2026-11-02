@@ -1,6 +1,6 @@
 """ebench: the single evaluation contract used by every study in this repository.
 
-Rules enforced here:
+Rules enforced here (see docs/REVISION_LOG.md):
   * Event-level and timestamp-level metrics are SEPARATE functions and are never mixed:
     event precision is always paired with event recall, timestamp precision with timestamp recall.
   * Event end dates are inclusive of the whole calendar day.
