@@ -1,6 +1,6 @@
 # Step 8 result (TSB-AD-U, run 2 Nov 2026) — recorded as pre-registered
 
-**Primary test: NOT SUPPORTED.** Partial Spearman between log median event length and the AUC-PR difference
+**Primary test: NOT SUPPORTED, in both runs.** Re-run with the 40 errored series restored (862 series, 17 datasets with >= 8 series): rho = -0.047, 95% interval [-0.163, 0.139]. First run (822 series, 15 datasets): rho = -0.060, [-0.196, 0.125]. The numbers below are from the first run. Partial Spearman between log median event length and the AUC-PR difference
 (window_pca minus knn_inductive), controlling for log prevalence, stratified by source dataset, Fisher-z combined,
 bootstrap over datasets: rho = -0.060, 95% interval [-0.196, 0.125]; 822 series, 23 source datasets, 15 with >= 8 series.
 The withdrawn rule (reconstruction gains over density on longer events) is therefore not recovered on public data; it stays withdrawn.
