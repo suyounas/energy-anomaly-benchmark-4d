@@ -38,3 +38,12 @@ Outputs: `gb_resolution_ablation.csv`, `ercot_resolution_ablation.csv`, `gb_equa
 * Features are re-derived by `ebench`, so numbers will not reproduce the earlier tables exactly.
 * Tier 2 (27 Jun - 10 Aug 2023) was identified after seeing detector output: sensitivity analysis only, never the headline.
 * The runner was tested here on synthetic stand-in files, not on your real data.
+
+## Step 7: stronger / simpler detectors (CPU only, no torch)
+```bash
+FEATURES=resid FAMS="isolation_forest knn_inductive rolling_z diff_z seasonal_naive window_pca window_knn window_iforest matrix_profile spectral_residual" \
+  OUT=results/real_data/2026-11-02_stronger N_SEEDS=5 N_TRIALS=8 bash scripts/run_real_checks.sh --only tuning_gb,tuning_ercot
+# same with FEATURES=recipe (seasonal_naive is skipped there: it needs resid)
+pip3 install stumpy TSB-AD && python3 experiments/crosscheck_official.py
+```
+Read `<out>_ci.csv`: a family is only "better" if the others have `reliably_worse_than_best = True`.

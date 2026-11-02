@@ -14,3 +14,4 @@ from .metrics import (  # noqa: F401
     paired_block_bootstrap, summarise_paired,
 )
 from .windows import contiguous_segments, make_windows  # noqa: F401
+from .rangemetrics import range_auc_pr, vus_pr  # noqa: F401

@@ -56,6 +56,14 @@ def main(a):
         y_inj_nat = (cell_nat >= 0).astype(int)
     t_w, x_inj, y_inj = resample(t0[m0], x_inj_nat, y_inj_nat, a.factor)
     FEATS = feature_cols(a.features); resid = a.features == "resid"
+    keep = []
+    for f in a.families:
+        missing = [r for r in FAMILIES[f].get("requires", []) if r not in FEATS]
+        if missing:
+            print(f"SKIP {f}: needs feature(s) {missing}; run with --features resid")
+        else:
+            keep.append(f)
+    a.families = keep
     F_inj = build_features(t_w, x_inj, spd, a.window_days, with_resid=resid)
     y_all = pd.Series(y_inj, index=t_w).reindex(F_inj.index).fillna(0).to_numpy().astype(int)
     split_t = t_w[min(n_fit_native // a.factor, len(t_w) - 1)]

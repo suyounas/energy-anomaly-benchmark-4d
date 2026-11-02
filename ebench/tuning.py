@@ -73,6 +73,10 @@ FAMILIES = {
 }
 
 
+from .stronger import STRONGER   # noqa: E402  (registered after FAMILIES is defined)
+FAMILIES.update(STRONGER)
+
+
 def sample_configs(space, n, rng):
     keys = list(space)
     seen, out, tries = set(), [], 0

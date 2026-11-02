@@ -23,7 +23,7 @@ N_SEEDS=${N_SEEDS:-5}
 VAL_SUITE=${VAL_SUITE:-taxonomy}
 FEATURES=${FEATURES:-recipe}
 TAG=""; [ "$FEATURES" = "recipe" ] || TAG="_$FEATURES"
-FAMS="isolation_forest knn_inductive rolling_z"
+FAMS="${FAMS:-isolation_forest knn_inductive rolling_z}"
 [ "${NEURAL:-0}" = "1" ] && FAMS="$FAMS lstm_ae transformer"
 
 DRY=0; ONLY=""
