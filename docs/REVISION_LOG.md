@@ -81,3 +81,7 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * New `ebench/crossseries.py`: partial Spearman, dataset-stratified Fisher-z combination, bootstrap over source datasets, mean rank by bin.
 * New `experiments/public_benchmark.py` (`run` / `analyse`): TSB-AD-U loader (prints schema, fails loudly), training prefix from the `_tr_<N>_` file name, autocorrelation period estimate, nine detectors scored on the SAME test rows, AUC-PR and VUS-PR per series, resumable and parallel. The archive is not reachable from the authoring sandbox: the run happens on the user's machine, so no result exists yet.
 * Tests: new tests for the statistics and a synthetic TSB-AD-format end-to-end run; fixed a period-estimation bug found by them (the ACF maximum at tiny lags was taken as the period; now local maxima only).
+
+## Step 8 result and fix, 2 Nov 2026
+* Result recorded in `docs/STEP8_RESULT.md`: primary test NOT SUPPORTED (rho -0.060, interval [-0.196, 0.125]).
+* Bug: constant/degenerate training prefix made `estimate_period` raise `StopIteration` (40 series). Fixed (fallback period, flagged `period_found=0`); new `--retry-errors` flag re-runs only error rows; 3 new tests (133 pass).

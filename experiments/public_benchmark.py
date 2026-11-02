@@ -64,13 +64,15 @@ def estimate_period(x, lo=4, hi=200, min_acf=0.2):
     r = r - r.mean()
     f = np.fft.rfft(r, 2 * n)
     acf = np.fft.irfft(f * np.conj(f))[:n]
-    acf = acf / (acf[0] + 1e-12)
+    if not np.isfinite(acf).all() or acf[0] <= 1e-12:      # constant or degenerate prefix: no period to find
+        return int(np.clip(n // 50, 16, 100)), False
+    acf = acf / acf[0]
     seg = acf[lo - 1: hi + 1]                       # local maxima only: a smooth series has a high ACF at tiny lags
     pk = [lo + i for i in range(1, len(seg) - 1) if seg[i] > seg[i - 1] and seg[i] >= seg[i + 1]]
     if pk:
         top = max(acf[k] for k in pk)
-        k = next(k for k in pk if acf[k] >= 0.9 * top)   # smallest peak that is near the best (avoid multiples)
-        if acf[k] >= min_acf:
+        k = next((k for k in pk if acf[k] >= 0.9 * top), None)   # smallest peak that is near the best (avoid multiples)
+        if k is not None and acf[k] >= min_acf:
             return k, True
     return int(np.clip(n // 50, 16, 100)), False
 
@@ -164,6 +166,11 @@ def cmd_run(a):
     x, y = load_series(files[0])
     print(f"schema check on {os.path.basename(files[0])}: n={len(x)}, anomalies={int(y.sum())}, "
           f"parsed (dataset, train_len)={parse_name(files[0])}")
+    if a.retry_errors and os.path.exists(a.out):           # drop rows from harness errors so they are run again
+        old = pd.read_csv(a.out)
+        bad = old.status.astype(str).str.startswith("error")
+        print(f"--retry-errors: re-running {int(bad.sum())} series whose status was an error")
+        old[~bad].to_csv(a.out, index=False)
     done = set(pd.read_csv(a.out).file) if os.path.exists(a.out) else set()
     todo = [f for f in files if os.path.basename(f) not in done]
     print(f"{len(files)} files, {len(done)} already done, {len(todo)} to run, {a.jobs} job(s)")
@@ -271,6 +278,7 @@ if __name__ == "__main__":
     r.add_argument("--jobs", type=int, default=1); r.add_argument("--max-series", type=int, default=0)
     r.add_argument("--datasets", nargs="*"); r.add_argument("--train-frac", type=float, default=0.1)
     r.add_argument("--seed", type=int, default=0); r.add_argument("--chunk", type=int, default=20)
+    r.add_argument("--retry-errors", action="store_true", help="re-run series whose status starts with 'error'")
     n = sub.add_parser("analyse")
     n.add_argument("--results", required=True); n.add_argument("--out", default="docs/step8_report.md")
     n.add_argument("--n-boot", type=int, default=500); n.add_argument("--seed", type=int, default=0)

@@ -85,3 +85,31 @@ def test_cli_run_resume_and_analyse(tmp_path):
 def test_missing_data_dir_fails_loudly(tmp_path):
     r = subprocess.run([sys.executable, os.path.join(ROOT, "experiments", "public_benchmark.py"), "run", "--data", str(tmp_path), "--out", str(tmp_path / "o.csv")], capture_output=True, text=True)
     assert r.returncode != 0 and "no CSV files" in (r.stderr + r.stdout)
+
+
+def test_constant_prefix_does_not_crash_period_estimate():
+    P, found = pb.estimate_period(np.ones(400))
+    assert not found and P >= 16
+
+
+def test_constant_prefix_series_is_evaluated_not_errored(tmp_path):
+    x, y, _ = make_series()
+    x[:300] = 1.0                                   # flat training prefix, as in some NAB/UCR series
+    write(tmp_path, "z_NAB_id_1_s_tr_300_1st_400.csv", x, y)
+    row = pb.evaluate_file(str(tmp_path / "z_NAB_id_1_s_tr_300_1st_400.csv"))
+    assert not str(row["status"]).startswith("error"), row
+
+
+def test_retry_errors_reruns_only_error_rows(tmp_path):
+    d = tmp_path / "data"; d.mkdir()
+    x, y, _ = make_series()
+    write(d, "a_X_id_1_s_tr_300_1st_400.csv", x, y)
+    write(d, "b_X_id_2_s_tr_300_1st_400.csv", x, y)
+    out = tmp_path / "r.csv"
+    pd.DataFrame([dict(file="a_X_id_1_s_tr_300_1st_400.csv", dataset="X", status="ok", n=1),
+                  dict(file="b_X_id_2_s_tr_300_1st_400.csv", dataset="X", status="error: StopIteration: ")]).to_csv(out, index=False)
+    run = [sys.executable, os.path.join(ROOT, "experiments", "public_benchmark.py"), "run", "--data", str(d), "--out", str(out)]
+    r = subprocess.run(run + ["--retry-errors"], capture_output=True, text=True, env=dict(os.environ, OMP_NUM_THREADS="1"))
+    assert r.returncode == 0, r.stderr[-1500:]
+    df = pd.read_csv(out).set_index("file")
+    assert len(df) == 2 and df.loc["b_X_id_2_s_tr_300_1st_400.csv", "status"] == "ok" and df.loc["a_X_id_1_s_tr_300_1st_400.csv", "n"] == 1
