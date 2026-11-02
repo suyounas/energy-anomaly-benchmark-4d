@@ -1,0 +1,491 @@
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: divide by zero encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: overflow encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_pca.py:606: RuntimeWarning: invalid value encountered in matmul
+  C = X.T @ X
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: overflow encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:148: RuntimeWarning: invalid value encountered in matmul
+  X_transformed = X @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: divide by zero encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: overflow encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:155: RuntimeWarning: invalid value encountered in matmul
+  X_transformed -= xp.reshape(self.mean_, (1, -1)) @ self.components_.T
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: divide by zero encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: overflow encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Library/Python/3.9/lib/python/site-packages/sklearn/decomposition/_base.py:197: RuntimeWarning: invalid value encountered in matmul
+  return X @ self.components_ + self.mean_
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: divide by zero encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: overflow encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+/Users/sulmanyounas/Desktop/energy-anomaly-benchmark-4d/experiments/../ebench/stronger.py:125: RuntimeWarning: invalid value encountered in matmul
+  corr = Zev[i:i + 2048] @ ref.T / m
+fit rows 5328, validation rows 3096, validation prevalence 0.171
+validation suite: 7 cells, event rows per cell: [96, 72, 96, 72, 96, 72, 24]
+                   val_min  val_max  ...  macro_lift_min  macro_lift_max
+family                               ...                                
+diff_z               0.425    0.425  ...           8.647           8.647
+isolation_forest     0.606    0.677  ...           8.421          10.824
+knn_inductive        0.314    0.323  ...           4.820           4.962
+matrix_profile       0.192    0.487  ...           1.424           9.192
+rolling_z            0.219    0.276  ...           3.028           4.532
+seasonal_naive       0.555    0.555  ...          13.932          13.932
+spectral_residual    0.183    0.200  ...           1.338           1.644
+window_iforest       0.319    0.434  ...           3.025           4.887
+window_knn           0.338    0.339  ...           5.992           6.001
+window_pca           0.351    0.543  ...           7.443           9.809
+
+[10 rows x 6 columns]
+per-cell validation lift of the DEFAULT config (1 = chance):
+                   shift1d  shift3d  burst1d  burst3d  ramp1d  ramp3d  pulse
+family                                                                      
+isolation_forest     10.01     3.60    18.91    25.16    4.36    3.00   7.62
+knn_inductive         0.84     1.03     1.41    23.88    5.12    1.63   0.62
+rolling_z             1.98     1.33     6.69     5.28    0.97    1.28   9.53
+diff_z                1.35     0.91    21.57    27.77    0.94    0.89   7.11
+seasonal_naive       12.93     3.73     9.29     9.30    5.20    4.10  52.98
+window_pca            0.88     0.98     1.92    32.00    2.68   18.80   0.60
+window_knn            0.68     0.96     1.31    32.03    3.02    3.41   0.58
+window_iforest        3.73     1.76     1.84     7.67    1.44    5.01   0.67
+matrix_profile        3.62     1.24    11.46    18.21    1.06    0.69   4.10
+spectral_residual     1.30     2.02     1.18     1.07    1.61    1.19   2.22
+NOTE diff_z: validation cannot separate its configs or sees no signal (see lifts above); the default config is used, 'tuned' == 'default' for this family
+NOTE seasonal_naive: validation cannot separate its configs or sees no signal (see lifts above); the default config is used, 'tuned' == 'default' for this family
+NOTE window_knn: validation cannot separate its configs or sees no signal (see lifts above); the default config is used, 'tuned' == 'default' for this family
+common evaluation rows: 34670 / 34728
+                          auc_pr         ts_f1  ... cov_Texas Freeze cov_Elliott spike       
+                            mean    std   mean  ...              std              mean    std
+family            config                        ...                                          
+diff_z            default  0.009  0.000  0.002  ...            0.000             0.008  0.000
+                  tuned    0.009  0.000  0.002  ...            0.000             0.008  0.000
+isolation_forest  default  0.013  0.003  0.034  ...            0.022             0.008  0.006
+                  tuned    0.015  0.002  0.037  ...            0.006             0.017  0.000
+knn_inductive     default  0.014  0.000  0.032  ...            0.000             0.158  0.000
+                  tuned    0.015  0.000  0.037  ...            0.000             0.192  0.000
+matrix_profile    default  0.133  0.000  0.134  ...            0.000             0.300  0.000
+                  tuned    0.029  0.000  0.060  ...            0.000             0.067  0.000
+rolling_z         default  0.012  0.000  0.024  ...            0.000             0.117  0.000
+                  tuned    0.010  0.000  0.016  ...            0.000             0.100  0.000
+seasonal_naive    default  0.239  0.000  0.125  ...            0.000             0.592  0.000
+                  tuned    0.239  0.000  0.125  ...            0.000             0.592  0.000
+spectral_residual default  0.008  0.000  0.017  ...            0.000             0.075  0.000
+                  tuned    0.008  0.000  0.016  ...            0.000             0.050  0.000
+window_iforest    default  0.032  0.020  0.044  ...            0.014             0.010  0.022
+                  tuned    0.059  0.032  0.047  ...            0.023             0.000  0.000
+window_knn        default  0.022  0.000  0.065  ...            0.000             0.250  0.000
+                  tuned    0.022  0.000  0.065  ...            0.000             0.250  0.000
+window_pca        default  0.080  0.000  0.060  ...            0.000             0.058  0.000
+                  tuned    0.141  0.000  0.068  ...            0.000             0.083  0.000
+
+[20 rows x 10 columns]
+paired 7D-block bootstrap, 200 replicates (seed-averaged ts_f1):
+                 detector  ts_f1  ts_f1_lo  ts_f1_hi  reliably_worse_than_best
+ isolation_forest|default  0.034       0.0     0.104                     False
+   isolation_forest|tuned  0.037       0.0     0.104                     False
+    knn_inductive|default  0.032       0.0     0.090                     False
+      knn_inductive|tuned  0.037       0.0     0.103                     False
+        rolling_z|default  0.024       0.0     0.052                     False
+          rolling_z|tuned  0.016       0.0     0.041                     False
+           diff_z|default  0.002       0.0     0.005                     False
+   seasonal_naive|default  0.125       0.0     0.254                     False
+       window_pca|default  0.060       0.0     0.171                     False
+         window_pca|tuned  0.068       0.0     0.169                     False
+       window_knn|default  0.065       0.0     0.161                     False
+   window_iforest|default  0.044       0.0     0.129                     False
+     window_iforest|tuned  0.047       0.0     0.142                     False
+   matrix_profile|default  0.134       0.0     0.257                     False
+     matrix_profile|tuned  0.060       0.0     0.158                     False
+spectral_residual|default  0.017       0.0     0.034                     False
+  spectral_residual|tuned  0.016       0.0     0.031                     False
