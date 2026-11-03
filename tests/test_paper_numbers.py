@@ -41,3 +41,12 @@ def test_quoted_label_validity_numbers():
     assert (f["labels|gb|auc_pr|n"], f["labels|gb|auc_pr|n_changed"], f["labels|gb|ts_f1|n_changed"]) == (19, 1, 1)
     assert (f["labels|ercot|auc_pr|n"], f["labels|ercot|auc_pr|n_changed"], f["labels|ercot|ts_f1|n_changed"]) == (17, 2, 9)
     assert round(f["labels|gb|auc_pr|min_tau"], 2) == -0.24 and round(f["labels|ercot|auc_pr|min_tau"], 2) == 0.62 and round(f["labels|ercot|ts_f1|min_tau"], 2) == 0.49
+
+
+def test_quoted_tier_numbers():
+    f = json.load(open(NJ))
+    assert f["tiers|B|LSTM-AE|n_flags"] == 1751 and round(100 * f["tiers|B|LSTM-AE|share_jul_sep"]) == 95 and round(100 * f["tiers|B|LSTM-AE|share_tier2"]) == 38
+    assert round(100 * f["tiers|B|Transformer|share_jul_sep"]) == 93 and round(100 * f["tiers|B|Transformer|share_tier2"]) == 37
+    assert f["tiers|B|LSTM-AE|f1_t1"] == 0 and round(f["tiers|B|LSTM-AE|f1_t12"], 2) == 0.43 and round(f["tiers|B|Transformer|f1_t12"], 2) == 0.42
+    assert round(f["tiers|B|LSTM-AE|f1_t12_lo"], 2) == 0.32 and round(f["tiers|B|LSTM-AE|f1_t12_hi"], 2) == 0.53
+    assert f["tiers|A|LSTM-AE|n_flags"] == 656 and f["tiers|A|LSTM-AE|share_jul_sep"] == 1.0 and f["tiers|A|LSTM-AE|share_tier2"] < 0.02 and f["tiers|A|LSTM-AE|f1_t12"] < 0.01

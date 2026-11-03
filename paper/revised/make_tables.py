@@ -239,5 +239,18 @@ if os.path.exists(f"{LS}/gb_report.md") and os.path.exists(f"{LS}/ercot_report.m
     open(f"{T}/label_events.tex", "w").write("\\begin{tabular}{llrrrrrr}\n\\toprule\nSeries & Event & Timestamps & Mean daily dev. & (non-event days) & Share $|z|>3$ & (non-event days) & \\% of non-event days below \\\\\n\\midrule\n" + "\n".join(LA) + "\n\\bottomrule\n\\end{tabular}\n")
     open(f"{T}/label_rank.tex", "w").write("\\begin{tabular}{llllrrl}\n\\toprule\nSeries & Metric & Baseline best & Best unchanged & Median $\\tau$ & Min $\\tau$ & Perturbations that change the best detector \\\\\n\\midrule\n" + "\n".join(LC) + "\n\\bottomrule\n\\end{tabular}\n")
 
+# ---------------------------------------------------------------- ERCOT label tiers (post-hoc Tier 2 sensitivity)
+TI = f"{R}/real_data/ercot_tiers.csv"
+if os.path.exists(TI):
+    ti = pd.read_csv(TI); L = []
+    short = {"LSTM Autoencoder": "LSTM-AE", "Transformer Encoder": "Transformer", "Isolation Forest": "IForest", "DBSCAN": "DBSCAN", "Rolling Z-score": "Rolling $z$"}
+    for prot in ("A", "B"):
+        for r in ti[ti.protocol == prot].itertuples():
+            L.append(f"{prot} & {short[r.detector]} & {int(r.n_flags):,} & {100 * r.share_flags_jul_sep_2023:.0f}\\% & {100 * r.share_flags_in_tier2:.0f}\\% & {r.tier1_f1:.3f} & {r.tier1_plus_tier2_f1:.3f} [{r.tier1_plus_tier2_f1_lo:.3f}, {r.tier1_plus_tier2_f1_hi:.3f}] \\\\")
+            k = f"tiers|{prot}|{short[r.detector]}"
+            facts.update({f"{k}|n_flags": int(r.n_flags), f"{k}|share_jul_sep": float(r.share_flags_jul_sep_2023), f"{k}|share_tier2": float(r.share_flags_in_tier2),
+                          f"{k}|f1_t1": float(r.tier1_f1), f"{k}|f1_t12": float(r.tier1_plus_tier2_f1), f"{k}|f1_t12_lo": float(r.tier1_plus_tier2_f1_lo), f"{k}|f1_t12_hi": float(r.tier1_plus_tier2_f1_hi)})
+    open(f"{T}/tiers.tex", "w").write("\\begin{tabular}{llrrrrl}\n\\toprule\nProtocol & Detector & Flags & Flags in Jul--Sep 2023 & Flags in Tier 2 & F1, Tier 1 & F1, Tier 1+2 [95\\% interval] \\\\\n\\midrule\n" + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
+
 json.dump(facts, open(f"{OUT}/numbers.json", "w"), indent=1, default=float)
 print(json.dumps({k: v for k, v in facts.items() if "|" not in k or "corr" in k or "range" in k or "diff" in k}, indent=1, default=float)[:3500])

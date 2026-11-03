@@ -98,6 +98,14 @@ A detector that flags an unlabelled period cannot show that the period is a true
 \caption{Analysis C: stability of the detector ranking under label perturbations (Kendall $\tau$ of the full ranking against the unperturbed labels; 19 label sets for GB, 17 for ERCOT).}\label{tab:labelC}
 \end{table*}
 
+\paragraph{(D) Flags outside the labels: ERCOT summer 2023.} Under the earlier pipeline's clean-window protocol (B), the LSTM-AE flags 1{,}751 test timestamps, 95\% of them in July--September 2023 and 38\% inside the Tier~2 window (27 June to 10 August 2023, ERCOT's record-demand period); the Transformer is similar (93\% and 37\%). Their F1 against Tier~1 is exactly zero, and 0.43 (interval 0.32--0.53) and 0.42 once Tier~2 is labelled (Table~\ref{tab:tiers}). Under the forward split (A) the same models flag only 656 timestamps, all in July--September 2023 but almost none in Tier~2, and F1 stays near zero. An F1 of zero against Tier~1 therefore means that these detectors missed the two pre-specified events, \emph{not} that they found nothing unusual: they respond to a period of record demand. We do not count this as a success, because Tier~2 was identified after seeing the output; it is reported as a sensitivity analysis, and the headline results use Tier~1 alone. The equal-budget runs (Sec.~\ref{sec:real}) are evaluated against Tier~1 only, so their ERCOT scores are lower bounds with respect to any additional true anomalies.
+
+\begin{table*}[t]
+\centering\scriptsize\setlength{\tabcolsep}{4pt}
+\input{tables/tiers.tex}
+\caption{ERCOT label tiers, earlier pipeline (single run): where each detector's flags fall and F1 with Tier~1 only versus Tier~1 plus the post-hoc Tier~2 window. Protocol A: forward split; B: clean-window split. Intervals are day-block bootstrap.}\label{tab:tiers}
+\end{table*}
+
 \paragraph{Limits.} Documented external events are a coarser label than point annotations: the labelled window covers days in which many individual timestamps look normal, which is why timestamp-level recall is bounded and why per-event coverage is reported. Public benchmark labels have their own flaws~\cite{wu2023flawed}; Sec.~\ref{sec:public} therefore treats them as noisy and reports sensitivity subsets.
 
 \section{Evaluation Protocol}\label{sec:protocol}
