@@ -86,3 +86,11 @@ def test_cli(tmp_path):
     txt = open(str(out) + "_report.md").read()
     assert "A. Does the series deviate" in txt and "B. Unlabelled days" in txt and "C. Detector ranking" in txt
     assert os.path.exists(str(out) + "_scenarios.csv")
+
+
+def test_unlabelled_days_works_when_index_is_named():
+    # real CSVs give the time index a name (e.g. "Datetime"); the candidate table must still have a "day" column
+    t = pd.date_range("2021-01-01", periods=24 * 60, freq="h", name="Datetime")
+    r = np.random.default_rng(0).normal(size=len(t)); r[24 * 40:24 * 41] += 8
+    n, n_out, cand, thr = unlabelled_days(t, r, [("2021-01-10", "2021-01-12", "E")])
+    assert "day" in cand.columns and "daily_dev" in cand.columns

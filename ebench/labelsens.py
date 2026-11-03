@@ -136,5 +136,5 @@ def unlabelled_days(times, resid, events, weakest=None):
     ev_dev = [dd.reindex(pd.date_range(_d(s), _d(e))).dropna().mean() for s, e, _ in events]
     thr = weakest if weakest is not None else float(np.nanmin(ev_dev))
     out = dd[~dd.index.isin(in_days)]
-    cand = out[out >= thr].rename("daily_dev").reset_index().rename(columns={"index": "day"})
+    cand = out[out >= thr].rename("daily_dev").rename_axis("day").reset_index()   # index name varies (e.g. "Datetime")
     return len(cand), len(out), cand, thr

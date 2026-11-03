@@ -199,5 +199,45 @@ if os.path.exists(P):
         sens.append(f"{nm} & {len(sub)} & {len(p_)} & {a_:.3f} & [{l_:.3f}, {h_:.3f}] \\\\")
     open(f"{T}/public_sens.tex", "w").write("\\begin{tabular}{lrrrc}\n\\toprule\nSubset & Series & Datasets & $\\rho$ & 95\\% interval \\\\\n\\midrule\n" + "\n".join(sens) + "\n\\bottomrule\n\\end{tabular}\n")
 
+# ---------------------------------------------------------------- label validity (analyses A, B, C)
+import re
+from ebench.labelsens import rank_robustness
+LS = f"{R}/label_sens"
+if os.path.exists(f"{LS}/gb_report.md") and os.path.exists(f"{LS}/ercot_report.md"):
+    LA, LC = [], []
+    for ds, nm in (("gb", "GB"), ("ercot", "ERCOT")):
+        rep = open(f"{LS}/{ds}_report.md").read()
+        sec = rep.split("## A.")[1].split("## B.")[0]
+        for line in sec.splitlines():
+            c = [x.strip() for x in line.strip().strip("|").split("|")]
+            if len(c) == 7 and c[1].isdigit():
+                ev, nts, md_, sh, rmd, rsh, pct = c[0], int(c[1]), float(c[2]), float(c[3]), float(c[4]), float(c[5]), float(c[6])
+                LA.append(f"{nm} & {ev} & {nts:,} & {md_:.2f} & {rmd:.2f} & {100 * sh:.0f}\\% & {100 * rsh:.0f}\\% & {pct:.0f}\\% \\\\")
+                facts[f"labels|{ds}|{ev}|mean_dev"] = md_; facts[f"labels|{ds}|{ev}|pct_below"] = pct
+                facts[f"labels|{ds}|{ev}|share_above"] = sh; facts[f"labels|{ds}|ref_mean_dev"] = rmd; facts[f"labels|{ds}|ref_share_above"] = rsh
+                facts[f"labels|{ds}|{ev}|n_ts"] = nts
+        m = re.search(r"(\d+) of (\d+) days outside every labelled event reach the weakest event's daily deviation \(([\d.]+)\)", rep)
+        facts[f"labels|{ds}|cand"], facts[f"labels|{ds}|outside"], facts[f"labels|{ds}|thr"] = int(m.group(1)), int(m.group(2)), float(m.group(3))
+        cd = pd.read_csv(f"{LS}/{ds}_candidate_days.csv"); day = pd.to_datetime(cd["day"])
+        assert len(cd) == facts[f"labels|{ds}|cand"]
+        facts[f"labels|{ds}|cand_christmas_ny"] = int((((day.dt.month == 12) & (day.dt.day >= 24)) | ((day.dt.month == 1) & (day.dt.day <= 2))).sum())
+        sc = pd.read_csv(f"{LS}/{ds}_scenarios.csv")
+        for metric, mn in (("auc_pr", "AUC-PR"), ("ts_f1", "timestamp F1")):
+            summ, per = rank_robustness(sc, metric)
+            ch = per[~per.best_unchanged]
+            if len(ch) > 3:
+                chs = f"{len(ch)} of {len(per)}; new best: " + ", ".join(sorted(set(ch.best.str.replace("_", " "))))
+            else:
+                chs = "; ".join(f"{r.scenario} ({r.best.replace('_', ' ')})" for r in ch.itertuples()) or "none"
+            LC.append(f"{nm} & {mn} & {summ['baseline_best'].replace('_', ' ')} & {int(round(100 * summ['share_best_unchanged']))}\\% of {summ['n_scenarios']} & {summ['median_tau']:.2f} & {summ['min_tau']:.2f} & {chs} \\\\")
+            k = f"labels|{ds}|{metric}"
+            facts.update({f"{k}|best": summ["baseline_best"], f"{k}|share_unchanged": float(summ["share_best_unchanged"]), f"{k}|n": int(summ["n_scenarios"]),
+                          f"{k}|median_tau": float(summ["median_tau"]), f"{k}|min_tau": float(summ["min_tau"]), f"{k}|n_changed": int(len(ch))})
+        base = sc[sc.scenario == "baseline"].iloc[0].prevalence
+        facts[f"labels|{ds}|prevalence"] = float(base)
+        facts[f"labels|{ds}|prevalence_drop_first"] = float(sc[sc.kind == "drop"].prevalence.min())
+    open(f"{T}/label_events.tex", "w").write("\\begin{tabular}{llrrrrrr}\n\\toprule\nSeries & Event & Timestamps & Mean daily dev. & (non-event days) & Share $|z|>3$ & (non-event days) & \\% of non-event days below \\\\\n\\midrule\n" + "\n".join(LA) + "\n\\bottomrule\n\\end{tabular}\n")
+    open(f"{T}/label_rank.tex", "w").write("\\begin{tabular}{llllrrl}\n\\toprule\nSeries & Metric & Baseline best & Best unchanged & Median $\\tau$ & Min $\\tau$ & Perturbations that change the best detector \\\\\n\\midrule\n" + "\n".join(LC) + "\n\\bottomrule\n\\end{tabular}\n")
+
 json.dump(facts, open(f"{OUT}/numbers.json", "w"), indent=1, default=float)
 print(json.dumps({k: v for k, v in facts.items() if "|" not in k or "corr" in k or "range" in k or "diff" in k}, indent=1, default=float)[:3500])

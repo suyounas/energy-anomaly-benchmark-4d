@@ -9,7 +9,7 @@ every detector); only the LABELS change.  Output answers three questions without
       --event 2020-03-23 2020-05-31 COVID --event 2022-12-08 2022-12-17 ColdSnap --train-window 2018-06-01 2020-02-01 \
       --features resid --families isolation_forest knn_inductive rolling_z diff_z seasonal_naive window_pca matrix_profile --out results/label_sens/gb
 """
-import argparse, os, sys
+import argparse, os, sys, warnings
 import numpy as np, pandas as pd
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -43,7 +43,9 @@ def main(a):
             print(f"SKIP {name}"); continue
         use = cols if name not in ("seasonal_naive",) else feature_cols("resid")
         per_seed = [np.asarray(fam["fn"](dict(fam["default"]), Ftr, Fte, use, s, spd=spd), float) for s in range(a.n_seeds)]
-        scores[name] = np.nanmean(per_seed, axis=0)
+        with np.errstate(all="ignore"), warnings.catch_warnings():
+            warnings.simplefilter("ignore", RuntimeWarning)      # rows where every seed is NaN (window warm-up) are dropped below
+            scores[name] = np.nanmean(per_seed, axis=0)
     common = np.ones(len(Fte), bool)
     for s in scores.values():
         common &= np.isfinite(s)

@@ -27,3 +27,17 @@ def test_quoted_factorial_and_public_numbers():
     assert f["factorial|global_best"] == "seasonal_naive" and round(100 * f["factorial|global_best_wins_share"]) == 56
     assert (f["public|n_series"], f["public|n_datasets"], f["public|n_datasets_min8"]) == (862, 23, 17)
     assert round(f["public|rho"], 3) == -0.047 and f["public|lo"] < 0 < f["public|hi"]
+
+
+def test_quoted_label_validity_numbers():
+    f = json.load(open(NJ))
+    assert round(f["labels|gb|COVID|mean_dev"], 2) == 1.26 or round(f["labels|gb|COVID|mean_dev"], 2) == 1.27
+    assert round(f["labels|gb|COVID|pct_below"]) == 80 and round(f["labels|gb|ColdSnap|pct_below"]) == 98
+    assert (f["labels|gb|cand"], f["labels|gb|outside"], f["labels|gb|cand_christmas_ny"]) == (546, 2842, 61)
+    assert (f["labels|ercot|cand"], f["labels|ercot|outside"]) == (69, 1816)
+    n_lab = f["labels|gb|COVID|n_ts"] + f["labels|gb|ColdSnap|n_ts"]
+    assert (f["labels|gb|COVID|n_ts"], n_lab) == (1679, 1919) and round(100 * 1679 / n_lab) == 87
+    assert round(100 * f["labels|gb|prevalence"], 1) == 3.4 and round(100 * f["labels|gb|prevalence_drop_first"], 2) == 0.44
+    assert (f["labels|gb|auc_pr|n"], f["labels|gb|auc_pr|n_changed"], f["labels|gb|ts_f1|n_changed"]) == (19, 1, 1)
+    assert (f["labels|ercot|auc_pr|n"], f["labels|ercot|auc_pr|n_changed"], f["labels|ercot|ts_f1|n_changed"]) == (17, 2, 9)
+    assert round(f["labels|gb|auc_pr|min_tau"], 2) == -0.24 and round(f["labels|ercot|auc_pr|min_tau"], 2) == 0.62 and round(f["labels|ercot|ts_f1|min_tau"], 2) == 0.49

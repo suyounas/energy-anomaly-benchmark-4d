@@ -1,0 +1,10 @@
+\begin{tabular}{llllrrl}
+\toprule
+Series & Metric & Baseline best & Best unchanged & Median $\tau$ & Min $\tau$ & Perturbations that change the best detector \\
+\midrule
+GB & AUC-PR & matrix profile & 95\% of 19 & 1.00 & -0.24 & drop COVID (seasonal naive) \\
+GB & timestamp F1 & matrix profile & 95\% of 19 & 0.98 & -0.05 & drop COVID (seasonal naive) \\
+ERCOT & AUC-PR & seasonal naive & 88\% of 17 & 0.81 & 0.62 & drop Elliott spike (matrix profile); start later 3d (matrix profile) \\
+ERCOT & timestamp F1 & matrix profile & 47\% of 17 & 0.81 & 0.49 & 9 of 17; new best: seasonal naive \\
+\bottomrule
+\end{tabular}
