@@ -1,0 +1,7 @@
+{
+  "title": "energy-anomaly-benchmark-4d: evaluating anomaly detectors on energy time series",
+  "upload_type": "software",
+  "creators": [{"name": "Younas, Sulman"}],
+  "access_right": "open",
+  "related_identifiers": [{"relation": "isSupplementTo", "identifier": "https://github.com/suyounas/energy-anomaly-benchmark-4d", "scheme": "url"}]
+}

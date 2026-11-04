@@ -8,7 +8,8 @@ R = "results"; OUT = "paper/revised"; T = f"{OUT}/tables"
 DUR = ["2h", "12h", "1d", "3d", "7d", "14d"]
 NAMES = {"isolation_forest": "IForest", "dbscan_published": "DBSCAN (as published)",
          "knn_inductive": "kNN-to-train", "z_published": "$|$return$|$ top-5\\%",
-         "z_rolling": "Rolling $z>3$", "pca_window_recon": "PCA window recon."}
+         "z_rolling": "Rolling $z>3$", "pca_window_recon": "PCA window recon.",
+         "lstm_ae": "LSTM-AE", "transformer": "Transformer"}
 facts = {}
 
 # ---------------------------------------------------------------- datasets / events
@@ -176,7 +177,7 @@ if os.path.exists(G):
     L.append(f"Remainder (higher-order terms, replicate noise) & {rs:.1f} \\\\")
     det_all = float(ssd.loc[ssd.term.str.contains("detector"), "share"].sum()) * 100; facts["factorial|detector_all"] = det_all
     facts["factorial|n_datasets"] = int(g[["background", "event", "dur_h", "mag", "res_h", "rep"]].drop_duplicates().shape[0])
-    open(f"{T}/factorial.tex", "w").write("\\begin{tabular}{lr}\n\\toprule\nSource & \\% of variance in skill \\\\\n\\midrule\n" + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
+    open(f"{T}/factorial.tex", "w").write("\\begin{tabular}{@{}p{0.66\\columnwidth}r@{}}\n\\toprule\nSource & \\% of variance in skill \\\\\n\\midrule\n" + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
     wins = g.groupby(["background", "event", "dur_h", "mag", "res_h", "features", "detector"]).skill.mean().unstack("detector")
     facts["factorial|global_best"] = wins.mean().idxmax(); facts["factorial|global_best_wins_share"] = float((wins.idxmax(axis=1) == wins.mean().idxmax()).mean())
     ev_win = wins.idxmax(axis=1).reset_index(name="w").groupby("event").w.value_counts(normalize=True)

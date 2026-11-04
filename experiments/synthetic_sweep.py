@@ -19,7 +19,42 @@ DURATIONS = {"2h": 4, "12h": 24, "1d": 48, "3d": 144, "7d": 336, "14d": 672}   #
 RESOLUTIONS = {"30min": 1, "1h": 2, "1d": 48}                                    # base steps / sample
 
 
-def run_one(seed, dname, rname, mag, prevalence, n_steps, kind):
+NEURAL_CFG = {"lstm_ae": dict(hidden=32, latent=8, lr=1e-3, epochs=30, batch=32),
+              "transformer": dict(d_model=32, nhead=4, layers=2, lr=5e-4, epochs=30, batch=32)}   # as in Table 'det' of the paper
+
+
+_MODEL_CACHE = {}
+
+
+def neural_results(Ftr, Fte, ttr, tte, seed, epochs=None, budget=0.05, batch=None, cache_key=None):
+    """LSTM-AE and Transformer (window 30 samples, trained on the clean training rows only, features scaled with
+    training statistics); the top `budget` of the test scores are flagged, like every other budgeted detector.
+    The training rows of one (seed, resolution) are identical for every event duration (events are injected into the test
+    part only), so a model is trained once per (seed, resolution, kind) and re-used; a hash of the training array guards this."""
+    from ebench.neural import fit_reconstruction, score_reconstruction
+    mu, sd = Ftr.mean(), Ftr.std().replace(0, 1)
+    A = ((Ftr - mu) / sd).fillna(0).to_numpy(float); B = ((Fte - mu) / sd).fillna(0).to_numpy(float)
+    digest = hash(A.tobytes())
+    out = {}
+    for kind, cfg in NEURAL_CFG.items():
+        cfg = dict(cfg, epochs=epochs or cfg["epochs"])
+        if batch:
+            cfg["batch"] = batch
+        key = (cache_key, kind, digest, cfg["epochs"], cfg["batch"])
+        if key not in _MODEL_CACHE:
+            if len(_MODEL_CACHE) > 8:                      # keep memory bounded: one (seed, resolution) at a time
+                _MODEL_CACHE.clear()
+            _MODEL_CACHE[key] = fit_reconstruction(kind, cfg, A, ttr, seed)
+        model, device = _MODEL_CACHE[key]
+        sc = score_reconstruction(model, device, B, tte)
+        ok = np.isfinite(sc)
+        thr = np.quantile(sc[ok], 1 - budget) if ok.any() else np.inf
+        flag = np.zeros(len(sc), int); flag[ok] = (sc[ok] >= thr).astype(int)
+        out[kind] = (np.nan_to_num(sc), flag)
+    return out
+
+
+def run_one(seed, dname, rname, mag, prevalence, n_steps, kind, neural=False, epochs=None, neural_only=False, batch=None):
     rng = np.random.default_rng(seed)
     dsteps, f = DURATIONS[dname], RESOLUTIONS[rname]
     if dsteps < f:
@@ -29,6 +64,7 @@ def run_one(seed, dname, rname, mag, prevalence, n_steps, kind):
     x2, y, ev = inject_events(x, t, test_start, dsteps, prevalence, mag, rng, kind)
     t, x2, y = resample(t, x2, y, f)
     ts = test_start // f
+    ttr_ = t[:ts]
     spd = STEPS_PER_DAY // f
     F = features(x2, spd)
     Ftr, Fte = F.iloc[:ts], F.iloc[ts:]
@@ -36,12 +72,16 @@ def run_one(seed, dname, rname, mag, prevalence, n_steps, kind):
     pi = float(yte.mean())
     events = [(a, b, n) for a, b, n in ev]
     rows = []
-    res = run_classical(Ftr, Fte, seed=seed)
-    pw_score, pw_flag, idx = pca_window_reconstruction(x2[:ts], t[:ts], x2[ts:], tte)
-    # sequence-style detectors are scored on windowed samples only (as in the published tables)
-    res["pca_window_recon"] = (pw_score, np.where(np.isnan(pw_score), 0, 0))
-    full_flag = np.zeros(len(yte), int); full_flag[idx] = pw_flag
-    res["pca_window_recon"] = (np.nan_to_num(pw_score), full_flag)
+    res = {}
+    if not neural_only:
+        res = run_classical(Ftr, Fte, seed=seed)
+        pw_score, pw_flag, idx = pca_window_reconstruction(x2[:ts], t[:ts], x2[ts:], tte)
+        # sequence-style detectors are scored on windowed samples only (as in the published tables)
+        res["pca_window_recon"] = (pw_score, np.where(np.isnan(pw_score), 0, 0))
+        full_flag = np.zeros(len(yte), int); full_flag[idx] = pw_flag
+        res["pca_window_recon"] = (np.nan_to_num(pw_score), full_flag)
+    if neural or neural_only:
+        res.update(neural_results(Ftr, Fte, ttr_, tte, seed, epochs, batch=batch, cache_key=(seed, rname, mag)))
     for det, (score, flag) in res.items():
         flag = np.asarray(flag).astype(int)
         ts_m = timestamp_level_prf(yte, flag)
@@ -60,20 +100,25 @@ def run_one(seed, dname, rname, mag, prevalence, n_steps, kind):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--seeds", type=int, default=10)
+    ap.add_argument("--seed-start", type=int, default=0, help="first seed (lets a long run be split into per-seed chunks)")
     ap.add_argument("--prevalence", type=float, default=0.03)
     ap.add_argument("--mags", type=float, nargs="+", default=[3.0])
     ap.add_argument("--kind", default="shift")
     ap.add_argument("--years", type=float, default=9.6)
     ap.add_argument("--durations", nargs="+", default=list(DURATIONS))
     ap.add_argument("--resolutions", nargs="+", default=list(RESOLUTIONS))
+    ap.add_argument("--neural", action="store_true", help="also run LSTM-AE and Transformer (needs torch; use a GPU)")
+    ap.add_argument("--neural-only", action="store_true", help="run only the two neural models (merge with the classical CSV afterwards)")
+    ap.add_argument("--neural-batch", type=int, default=None, help="override the batch size (Table det uses 32)")
+    ap.add_argument("--neural-epochs", type=int, default=None)
     ap.add_argument("--out", default="results/synthetic/sweep.csv")
     a = ap.parse_args()
     n_steps = int(a.years * 365.25 * STEPS_PER_DAY)
     os.makedirs(os.path.dirname(a.out), exist_ok=True)
     allrows, t0 = [], time.time()
-    grid = list(itertools.product(range(a.seeds), a.durations, a.resolutions, a.mags))
+    grid = list(itertools.product(range(a.seed_start, a.seed_start + a.seeds), a.durations, a.resolutions, a.mags))
     for i, (seed, d, r, m) in enumerate(grid):
-        allrows += run_one(seed, d, r, m, a.prevalence, n_steps, a.kind)
+        allrows += run_one(seed, d, r, m, a.prevalence, n_steps, a.kind, a.neural, a.neural_epochs, a.neural_only, a.neural_batch)
         if (i + 1) % 10 == 0:
             print(f"{i+1}/{len(grid)}  {time.time()-t0:.0f}s", flush=True)
             pd.DataFrame(allrows).to_csv(a.out, index=False)

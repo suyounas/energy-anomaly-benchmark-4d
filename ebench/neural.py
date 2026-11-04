@@ -55,15 +55,12 @@ def _build_transformer(nn, n_feat, d_model, nhead, layers, seq_len, ff=64):
     return TE()
 
 
-def reconstruction_scores(kind, cfg, X_fit, t_fit, X_eval, t_eval, seed, seq_len=30, device=None):
-    """Train on windows of X_fit (segment-aware), return per-timestamp score on X_eval
-    (squared reconstruction error of the window ending at that timestamp; NaN before the first
-    full window of each contiguous segment)."""
+def fit_reconstruction(kind, cfg, X_fit, t_fit, seed, seq_len=30, device=None):
+    """Train an autoencoder on windows of X_fit (segment-aware); returns (model, device)."""
     torch, nn = _torch()
     torch.manual_seed(seed); np.random.seed(seed)
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")
     Wf, _ = make_windows(X_fit, t_fit, seq_len)
-    We, idx = make_windows(X_eval, t_eval, seq_len)
     n_feat = Wf.shape[-1]
     if kind == "lstm_ae":
         model = _build_lstm_ae(nn, n_feat, cfg["hidden"], cfg["latent"])
@@ -82,6 +79,13 @@ def reconstruction_scores(kind, cfg, X_fit, t_fit, X_eval, t_eval, seed, seq_len
         for b in loader:
             b = b.to(device); opt.zero_grad()
             loss = lossf(model(b), b); loss.backward(); opt.step()
+    return model, device
+
+
+def score_reconstruction(model, device, X_eval, t_eval, seq_len=30):
+    """Per-timestamp squared reconstruction error of the window ending at each timestamp (NaN before the first full window)."""
+    torch, _ = _torch()
+    We, idx = make_windows(X_eval, t_eval, seq_len)
     model.eval(); errs = []
     with torch.no_grad():
         for i in range(0, len(We), 512):
@@ -91,3 +95,11 @@ def reconstruction_scores(kind, cfg, X_fit, t_fit, X_eval, t_eval, seed, seq_len
     if errs:
         full[idx] = np.concatenate(errs)
     return full
+
+
+def reconstruction_scores(kind, cfg, X_fit, t_fit, X_eval, t_eval, seed, seq_len=30, device=None):
+    """Train on windows of X_fit (segment-aware), return per-timestamp score on X_eval
+    (squared reconstruction error of the window ending at that timestamp; NaN before the first
+    full window of each contiguous segment)."""
+    model, device = fit_reconstruction(kind, cfg, X_fit, t_fit, seed, seq_len, device)
+    return score_reconstruction(model, device, X_eval, t_eval, seq_len)

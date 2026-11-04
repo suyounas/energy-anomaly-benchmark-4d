@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software or its results, please cite it."
+title: "energy-anomaly-benchmark-4d: evaluating anomaly detectors on energy time series"
+authors:
+  - family-names: Younas
+    given-names: Sulman
+    email: sulmanyounas93@gmail.com
+repository-code: "https://github.com/suyounas/energy-anomaly-benchmark-4d"
+# After the Zenodo release, add:  doi: "10.5281/zenodo.XXXXXXX"

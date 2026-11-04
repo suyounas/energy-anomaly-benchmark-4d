@@ -10,13 +10,14 @@ import matplotlib.pyplot as plt
 
 DUR = ["2h", "12h", "1d", "3d", "7d", "14d"]
 RES = ["30min", "1h", "1d"]
-DETS = ["isolation_forest", "dbscan_published", "knn_inductive", "z_published", "z_rolling", "pca_window_recon"]
+DETS = ["isolation_forest", "dbscan_published", "knn_inductive", "z_published", "z_rolling", "pca_window_recon", "lstm_ae", "transformer"]
 LABEL = {"isolation_forest": "Isolation Forest", "dbscan_published": "DBSCAN (as published)",
          "knn_inductive": "kNN-to-train (inductive)", "z_published": "|return| top-5% (as published 'z')",
-         "z_rolling": "Rolling z > 3 (as paper text)", "pca_window_recon": "PCA window reconstruction"}
-COL = dict(zip(DETS, ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300"]))
-MARK = dict(zip(DETS, ["o", "s", "^", "D", "v", "P"]))
-LS = dict(zip(DETS, ["-", "--", "-.", ":", "-", "--"]))
+         "z_rolling": "Rolling z > 3 (as paper text)", "pca_window_recon": "PCA window reconstruction",
+         "lstm_ae": "LSTM autoencoder", "transformer": "Transformer autoencoder"}
+COL = dict(zip(DETS, ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6b3fa0", "#7a4a1d"]))
+MARK = dict(zip(DETS, ["o", "s", "^", "D", "v", "P", "X", "*"]))
+LS = dict(zip(DETS, ["-", "--", "-.", ":", "-", "--", "-.", ":"]))
 INK, MUTED, GRID = "#0b0b0b", "#52514e", "#e4e3df"
 
 
@@ -42,6 +43,8 @@ def panel_fig(S, metric, ylabel, path, hline=None, hline_label=None, ylim=None):
     for ax, r in zip(axes, RES):
         ax.set_facecolor("#fcfcfb")
         for d in DETS:
+            if d not in set(S.detector):
+                continue
             s = S[(S.resolution == r) & (S.detector == d)].set_index("duration").reindex(DUR)
             m, c = s[f"{metric}_mean"].to_numpy(), s[f"{metric}_ci95"].to_numpy()
             ax.plot(x, m, color=COL[d], ls=LS[d], marker=MARK[d], ms=4.5, lw=1.5, label=LABEL[d])
