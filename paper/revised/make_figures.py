@@ -63,7 +63,6 @@ def fig_aucpr():
         df = pd.read_csv(ROOT / f"results/synthetic/summary_{kind}.csv")
         fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
         sweep_panel(df, "auc_pr_mean", "auc_pr_ci95", "AUC-PR", axes, ref=0.03)
-        axes[0].text(5.2, 0.05, "chance (3%)", ha="right", va="bottom", fontsize=7.5, color="0.35")
         fig.suptitle(f"AUC-PR against event duration, {lab} (prevalence fixed at 3%)", y=1.0, fontsize=9.5, fontweight="bold")
         h, l = axes[0].get_legend_handles_labels()
         fig.legend(h, l, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.09), columnspacing=1.2, handletextpad=0.4)

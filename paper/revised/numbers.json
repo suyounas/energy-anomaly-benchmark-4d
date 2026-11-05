@@ -40,7 +40,7 @@
   0.1132,
   0.2425
  ],
- "shift|corr_dbscan_f1_alert_rate": -0.9168952060532768,
+ "shift|corr_dbscan_f1_alert_rate": -0.9168952060532765,
  "shift|dbscan_f1_30min_vs_1h_max_abs_diff": 0.02070000000000005,
  "shift|dbscan_f1_range": [
   0.2181,
@@ -83,7 +83,7 @@
    "auc_pr_mean": 0.108
   }
  ],
- "shift|n_runs": 960,
+ "shift|n_runs": 1280,
  "shift|n_seeds": 10,
  "burst|prevalence_range": [
   0.0299274082211302,
@@ -93,7 +93,7 @@
   0.0863,
   0.214
  ],
- "burst|corr_dbscan_f1_alert_rate": 0.09637756204841764,
+ "burst|corr_dbscan_f1_alert_rate": 0.09637756204841763,
  "burst|dbscan_f1_30min_vs_1h_max_abs_diff": 0.02169999999999997,
  "burst|dbscan_f1_range": [
   0.1152,
@@ -136,7 +136,7 @@
    "auc_pr_mean": 0.055
   }
  ],
- "burst|n_runs": 960,
+ "burst|n_runs": 1280,
  "burst|n_seeds": 10,
  "gb|matrix_profile|recipe|auc_pr": 0.2132044675689214,
  "gb|matrix_profile|recipe|ts_f1": 0.3320430107526881,
@@ -280,18 +280,18 @@
  "ercot|rolling_z|cov_Elliott spike": 0.11666666666666661,
  "ercot|spectral_residual|cov_Texas Freeze": 0.05555555555555549,
  "ercot|spectral_residual|cov_Elliott spike": 0.075,
- "factorial|detector": 19.920520027327033,
- "factorial|event": 10.372104252031654,
+ "factorial|detector": 19.920520027327036,
+ "factorial|event": 10.372104252031658,
  "factorial|dur_h x detector": 10.084292194420156,
- "factorial|event x detector": 9.574482130841314,
- "factorial|event x dur_h": 6.263437234504861,
- "factorial|mag": 4.542527123798947,
- "factorial|mag x detector": 4.084097059710811,
- "factorial|res_h x detector": 2.264852969908428,
+ "factorial|event x detector": 9.574482130841316,
+ "factorial|event x dur_h": 6.263437234504862,
+ "factorial|mag": 4.542527123798949,
+ "factorial|mag x detector": 4.084097059710812,
+ "factorial|res_h x detector": 2.2648529699084285,
  "factorial|features x detector": 0.466648629352971,
- "factorial|background x detector": 1.0471555367139183,
- "factorial|residual": 23.96092298603355,
- "factorial|detector_all": 47.44204854827463,
+ "factorial|background x detector": 1.0471555367139185,
+ "factorial|residual": 23.960922986033516,
+ "factorial|detector_all": 47.44204854827464,
  "factorial|n_datasets": 648,
  "factorial|global_best": "seasonal_naive",
  "factorial|global_best_wins_share": 0.5617283950617284,
@@ -304,9 +304,9 @@
  "public|n_series": 862,
  "public|n_datasets": 23,
  "public|n_datasets_min8": 17,
- "public|rho": -0.04662613873439518,
- "public|lo": -0.16343135070705886,
- "public|hi": 0.1387302147681201,
+ "public|rho": -0.046626138734395174,
+ "public|lo": -0.1634313507070589,
+ "public|hi": 0.13873021476812022,
  "public|pca_beats_knn": 0.25406032482598606,
  "public|median_d": -0.09395472065807235,
  "public|n_excluded": 8,
