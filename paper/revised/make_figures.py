@@ -85,28 +85,36 @@ def fig_alert_f1():
     fig.savefig(OUT / "fig_shift_alertf1.pdf", bbox_inches="tight"); plt.close(fig)
 
 
-def box(ax, x, y, w, h, text, fc="#E8EEF8", ec="#1F5FBF", fs=8):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.06", fc=fc, ec=ec, lw=1.1))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs, linespacing=1.25)
+def box(ax, x, y, w, h, title, body, fc, ec, fs=6.7, tfs=8.0):
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.0,rounding_size=0.08", fc=fc, ec=ec, lw=1.2))
+    ax.text(x + w / 2, y + h - 0.14, title, ha="center", va="top", fontsize=tfs, fontweight="bold", color="0.1")
+    ax.text(x + w / 2, y + h - 0.52, body, ha="center", va="top", fontsize=fs, linespacing=1.3, color="0.15")
 
 
 def fig_pipeline():
-    fig, ax = plt.subplots(figsize=(7.2, 2.35)); ax.set_xlim(0, 12.4); ax.set_ylim(0, 4); ax.axis("off")
-    w, h, y = 1.75, 1.35, 1.35
-    steps = [("1  Series\n+ dated events\n(fixed before\nmodelling)", "#F3F3F3", "0.4"),
-             ("2  Resolution\nand features\n(return, rolling,\nseasonal residual)", "#E8EEF8", "#1F5FBF"),
-             ("3  Split\nforward 70/30 or\nclean window;\nscalers on train", "#E8EEF8", "#1F5FBF"),
-             ("4  Fit and score\n11 detectors,\nequal tuning\nbudget", "#E8EEF8", "#1F5FBF"),
-             ("5  Alerts\ntop 5% of test\nscores (alert\nbudget)", "#E8EEF8", "#1F5FBF"),
-             ("6  Metrics\nevent- and\ntimestamp-level,\nAUC-PR, VUS-PR", "#E6F3EC", "#138A63")]
-    xs = [0.05 + i * 2.06 for i in range(6)]
-    for x, (t, fc, ec) in zip(xs, steps):
-        box(ax, x, y, w, h, t, fc, ec, fs=6.6)
-    for a, b in zip(xs[:-1], xs[1:]):
-        ax.add_patch(FancyArrowPatch((a + w + 0.04, y + h / 2), (b - 0.04, y + h / 2), arrowstyle="-|>", mutation_scale=9, color="0.25", lw=1))
-    box(ax, 2.1, 0.0, 3.9, 0.95, "Label-validity checks (Sec. 4)\nresidual inside events, unlabelled days,\nranking under label perturbations", "#FFF4E0", "#E69500", fs=6.8)
-    box(ax, 6.4, 0.0, 3.9, 0.95, "Uncertainty (Sec. 5.3)\npaired 7-day block bootstrap,\nper-event coverage, reliably-worse flag", "#FFF4E0", "#E69500", fs=6.8)
-    box(ax, 0.05, 3.15, 12.0, 0.62, "Controlled studies reuse steps 2-6:  duration sweep (Sec. 6)  ·  648-dataset factorial (Sec. 7)  ·  GB and ERCOT (Sec. 8)  ·  862 public series (Sec. 9)", "#F7F7F7", "0.6", fs=7.2)
+    fig, ax = plt.subplots(figsize=(7.2, 3.35)); ax.set_xlim(0, 12.1); ax.set_ylim(0, 5.6); ax.axis("off")
+    w, gap, y, h = 1.70, 0.38, 2.15, 1.75
+    steps = [("1  Data", "series and\ndated events,\nfixed before\nmodelling", "#F1F1F1", "0.45"),
+             ("2  Inputs", "resolution,\nfeatures:\nreturn, rolling,\nseasonal resid.", "#E8EEF8", "#1F5FBF"),
+             ("3  Split", "forward 70/30\nsplit or clean\nwindow; scalers\nfit on train", "#E8EEF8", "#1F5FBF"),
+             ("4  Detect", "11 detectors,\nequal tuning\nbudget", "#E8EEF8", "#1F5FBF"),
+             ("5  Alerts", "top 5% of test\nscores (alert\nbudget)", "#E8EEF8", "#1F5FBF"),
+             ("6  Metrics", "event and\ntimestamp\nAUC-PR and\nVUS-PR", "#E6F3EC", "#138A63")]
+    xs = [i * (w + gap) for i in range(6)]
+    for x, (t, bd, fc, ec) in zip(xs, steps):
+        box(ax, x, y, w, h, t, bd, fc, ec)
+    for a_, b_ in zip(xs[:-1], xs[1:]):
+        ax.add_patch(FancyArrowPatch((a_ + w + 0.04, y + h / 2), (b_ - 0.04, y + h / 2), arrowstyle="-|>", mutation_scale=11, color="0.2", lw=1.3))
+    # checks that act on the same scores and labels
+    lw_ = 3 * w + 2 * gap
+    box(ax, 0, 0.1, lw_, 1.35, "Label-validity checks (Sec. 4)", "residual deviation inside events, unlabelled days,\nranking stability under label perturbations", "#FFF4E0", "#E69500")
+    box(ax, 3 * (w + gap), 0.1, lw_, 1.35, "Uncertainty (Sec. 5.3)", "paired 7-day block bootstrap, per-event coverage,\n\u201creliably worse\u201d flag", "#FFF4E0", "#E69500")
+    for xc in (lw_ / 2, 3 * (w + gap) + lw_ / 2):
+        ax.add_patch(FancyArrowPatch((xc, 1.47), (xc, y - 0.03), arrowstyle="<|-|>", mutation_scale=9, color="0.45", lw=1.0, ls=(0, (3, 2))))
+    # studies that reuse the pipeline
+    box(ax, 0, 4.25, 6 * w + 5 * gap, 1.2, "Studies that reuse steps 2\u20136",
+        "duration sweep (Sec. 6)  \u00b7  648-dataset factorial (Sec. 7)\nGB and ERCOT (Sec. 8)  \u00b7  862 public series (Sec. 9)", "#F7F7F7", "0.55", fs=7.2)
+    ax.add_patch(FancyArrowPatch((3 * (w + gap) - gap / 2, 4.22), (3 * (w + gap) - gap / 2, y + h + 0.03), arrowstyle="-|>", mutation_scale=10, color="0.45", lw=1.0, ls=(0, (3, 2))))
     fig.savefig(OUT / "fig_pipeline.pdf", bbox_inches="tight"); plt.close(fig)
 
 
