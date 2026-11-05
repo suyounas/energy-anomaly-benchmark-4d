@@ -7,3 +7,4 @@ authors:
     email: sulmanyounas93@gmail.com
 repository-code: "https://github.com/suyounas/energy-anomaly-benchmark-4d"
 # After the Zenodo release, add:  doi: "10.5281/zenodo.XXXXXXX"
+license: MIT
