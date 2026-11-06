@@ -37,7 +37,7 @@ def check_matrix_profile():
 
 def check_vus():
     try:
-        from TSB_AD.evaluation.metrics import get_metrics
+        from TSB_AD.evaluation.basic_metrics import generate_curve
     except Exception as e:                                  # noqa: BLE001
         print("SKIP TSB-AD:", e); return
     rng = np.random.default_rng(1)
@@ -52,8 +52,7 @@ def check_vus():
         run = np.diff(np.r_[0, y, 0]); med = int(np.median(np.where(run == -1)[0] - np.where(run == 1)[0]))
         win = max(2, med)
         try:
-            off = get_metrics(score, y, metric="vus", slidingWindow=win)
-            off_v = off.get("VUS-PR", off.get("VUS_PR"))
+            off_v = generate_curve(y.astype(int), score, win, "opt", 250)[7]   # 8th output = VUS-PR
         except Exception as e:                              # noqa: BLE001
             print("official call failed; paste this error:", repr(e)); return
         rows.append((vus_pr(y, score, max_buffer=win), off_v))
