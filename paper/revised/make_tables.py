@@ -117,6 +117,7 @@ from ebench.report import coverage_table
 from ebench.factorial import ss_decomposition
 from ebench.crossseries import stratified_partial_spearman
 NEW = f"{R}/real_data/2026-11-02_stronger_neural"
+VUS = f"{R}/real_data/2026-11-06_vus_rerun"   # VUS-PR intervals with event-unit resampling (AUC-PR rows identical to NEW)
 DET = [("matrix_profile", "Matrix profile"), ("seasonal_naive", "Seasonal-naive resid."), ("lstm_ae", "LSTM-AE"), ("transformer", "Transformer"),
        ("window_pca", "Window PCA"), ("isolation_forest", "Isolation Forest"), ("window_iforest", "Window IForest"),
        ("knn_inductive", "kNN-to-train"), ("window_knn", "Window kNN"), ("diff_z", "$|\\Delta x|$ one-liner"),
@@ -126,6 +127,7 @@ def real_table(ds, title_ev):
     fr = {sfx: pd.read_csv(f"{NEW}/{ds}_equal_budget{sfx}_final.csv") for sfx in ("", "_resid")}
     ci = {sfx: pd.read_csv(f"{NEW}/{ds}_equal_budget{sfx}_ci.csv").set_index("detector") for sfx in ("", "_resid")}
     cm = pd.read_csv(f"{NEW}/{ds}_equal_budget_ci_metrics.csv"); cm = cm[cm.metric == "auc_pr"].set_index("detector")
+    cv = pd.read_csv(f"{VUS}/{ds}_equal_budget_ci_metrics.csv"); cv = cv[cv.metric == "vus_pr"].set_index("detector")
     prev = float(fr[""].prevalence.iloc[0])
     L = []
     for fam, nm in DET:
@@ -133,19 +135,20 @@ def real_table(ds, title_ev):
         for sfx in ("", "_resid"):
             f = fr[sfx]; d = f[(f.family == fam) & (f.config == "default")]
             if d.empty:
-                cells += ["--", "--"]; continue
+                cells += ["--"] * (3 if sfx == "" else 2); continue
             ap = d.auc_pr.mean(); k = f"{fam}|default"
             if sfx == "" and k in cm.index:
                 a = iv(cm.loc[k, "point"], cm.loc[k, "lo"], cm.loc[k, "hi"])
             else:
                 a = f"{ap:.3f}"
             f1 = iv(ci[sfx].loc[k, "ts_f1"], ci[sfx].loc[k, "ts_f1_lo"], ci[sfx].loc[k, "ts_f1_hi"]) if k in ci[sfx].index else f"{d.ts_f1.mean():.3f}"
-            cells += [a, f1 + ("$^\\ast$" if k in ci[sfx].index and bool(ci[sfx].loc[k, "reliably_worse_than_best"]) else "")]
+            vp = (iv(cv.loc[k, "point"], cv.loc[k, "lo"], cv.loc[k, "hi"]) if k in cv.index else "--") if sfx == "" else None
+            cells += [a] + ([vp] if vp is not None else []) + [f1 + ("$^\\ast$" if k in ci[sfx].index and bool(ci[sfx].loc[k, "reliably_worse_than_best"]) else "")]
             facts[f"{ds}|{fam}|{'resid' if sfx else 'recipe'}|auc_pr"] = float(ap); facts[f"{ds}|{fam}|{'resid' if sfx else 'recipe'}|ts_f1"] = float(d.ts_f1.mean())
         L.append(f"{nm} & " + " & ".join(cells) + " \\\\")
     facts[f"{ds}|prevalence"] = prev
-    head = ("\\begin{tabular}{lcccc}\n\\toprule\n & \\multicolumn{2}{c}{4-feature recipe} & \\multicolumn{2}{c}{recipe + seasonal residual} \\\\\n"
-            "Detector & AUC-PR [95\\%] & F1 [95\\%] & AUC-PR & F1 [95\\%] \\\\\n\\midrule\n")
+    head = ("\\begin{tabular}{lccccc}\n\\toprule\n & \\multicolumn{3}{c}{4-feature recipe} & \\multicolumn{2}{c}{recipe + seasonal residual} \\\\\n"
+            "Detector & AUC-PR [95\\%] & VUS-PR [95\\%] & F1 [95\\%] & AUC-PR & F1 [95\\%] \\\\\n\\midrule\n")
     open(f"{T}/real_{ds}.tex", "w").write(head + "\n".join(L) + "\n\\bottomrule\n\\end{tabular}\n")
 real_table("gb", ""); real_table("ercot", "")
 # per-event coverage (residual feature set), default configs

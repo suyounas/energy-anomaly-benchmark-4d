@@ -100,3 +100,7 @@ Note: on the real data the `ebench` features are re-derived (return, rolling mea
 * Paper (`paper/revised/main.tex`) rewritten: positioning against TSB-AD, TimeEval, Wu and Keogh and the survey; data structure table; label provenance and validity; full protocol; attribution (step 9); real-data comparison with stronger baselines and intervals (neural Colab runs of 2 Nov 2026 added under `results/real_data/2026-11-02_stronger_neural/`); held-out public test (step 8). `make_tables.py` generates the new tables; `tests/test_paper_numbers.py` guards the quoted numbers.
 * New `ebench/labelsens.py` and `experiments/label_sensitivity.py` (detector-independent label checks and label-perturbation rankings); 6 tests. Not yet run on the real series.
 * The VUS-PR rows of `*_ci_metrics.csv` in the neural result folder are invalid (see README there); the paper does not use them.
+
+## Step 10, 6 Nov 2026: VUS-PR intervals recomputed
+* Re-ran the equal-budget tuning (recipe features, all 11 families) with the segment-based VUS-PR bootstrap: `results/real_data/2026-11-06_vus_rerun/`. AUC-PR rows and VUS-PR point values reproduce the 2 Nov files exactly; every VUS-PR point lies inside its interval.
+* `paper/revised/make_tables.py` reads the VUS-PR rows from the new folder; Tables `gb` and `ercot` gain a VUS-PR column (recipe features). Residual-feature VUS-PR intervals were not recomputed and are not reported.
