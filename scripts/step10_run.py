@@ -35,9 +35,38 @@ def load_events(path_b, path_a):
             for ba in str(r.BAs_mapped).replace(",", ";").split(";"):
                 ba = ba.strip()
                 if ba and ba != "nan":
-                    rows.append(dict(ba=ba, event_id=r.event_id, storm_group=r.storm_group, source_class=cls,
+                    rows.append(dict(ba=ba, event_id=r.event_id, storm_group=r.storm_group, source_class=cls, family=r.geography,
                                      start=pd.Timestamp(r.start_date), end=pd.Timestamp(r.end_date)))
     return pd.DataFrame(rows)
+
+def harmonise_events(ev):
+    """Amendment 4. (1) Within a BA, a Class B event whose window overlaps (or touches, +/- 1 day) a Class A
+    window is dropped: the operator or regulator declaration is the better label. (2) Storm groups are recomputed
+    over all events together: windows that overlap in time and share a family (heat, cold, tropical) are one group."""
+    if ev.empty:
+        return ev, 0
+    ev = ev.copy()
+    ev["fam"] = ev["family"].fillna("").map(lambda s: set(x for x in str(s).replace(",", "+").split("+") if x))
+    drop = []
+    for ba, g in ev.groupby("ba"):
+        A = g[g.source_class == "A"]
+        for r in g[g.source_class == "B"].itertuples():
+            if ((A.start - pd.Timedelta(days=1) <= r.end) & (r.start - pd.Timedelta(days=1) <= A.end)).any():
+                drop.append(r.Index)
+    ev = ev.drop(index=drop).reset_index(drop=True)
+    parent = list(range(len(ev)))
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]; i = parent[i]
+        return i
+    for i in range(len(ev)):
+        for j in range(i + 1, len(ev)):
+            if ev.start[i] <= ev.end[j] and ev.start[j] <= ev.end[i] and (ev.fam[i] & ev.fam[j]):
+                parent[find(i)] = find(j)
+    root = [find(i) for i in range(len(ev))]
+    names = {r: f"S{k+1:03d}" for k, r in enumerate(sorted(set(root)))}
+    ev["storm_group"] = [names[r] for r in root]
+    return ev.drop(columns=["fam"]), len(drop)
 
 def load_series(eia_dir, ba):
     long = pd.read_csv(os.path.join(eia_dir, "eia930_demand_long.csv.gz"), parse_dates=["datetime_utc"])
@@ -136,6 +165,9 @@ def main():
     os.makedirs(a.out, exist_ok=True)
     man = pd.read_csv(a.manifest)
     ev = load_events(a.events_b, a.events_a)
+    ev, n_dropped = harmonise_events(ev)
+    ev.to_csv(os.path.join(a.out, "events_final.csv"), index=False)
+    print(f"events after harmonisation: {len(ev)} ({n_dropped} Class B events dropped for overlapping a Class A window), storm groups: {ev.storm_group.nunique()}")
     bas = sorted(set(man[man.qualifies].ba) & set(ev.ba))
     if a.bas:
         bas = [b for b in bas if b in a.bas]
