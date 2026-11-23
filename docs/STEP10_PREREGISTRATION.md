@@ -63,3 +63,8 @@ Class B labels are weather-derived and state-level, so a BA is mapped by populat
 * Change: the training and scoring protocol only (the cross-fitting bullet above). The series list, the event rules, the thresholds (3 zones, 50% population, 1 to 21 days), the detectors, the budget and the analysis are unchanged.
 * Reason: a feasibility constraint on the design, found from the event table and not from any detector output. No detector had been run when this was written.
 * The event-selection thresholds were not changed after seeing counts.
+
+## Series manifest outcome (recorded before any detector was run; no rule changed)
+* `scripts/step10_fetch_eia930.py` found 57 balancing authorities in the EIA-930 bulk files for 2019-07-01 to 2026-07-31 (the 2026 July-December file was available and the data run to 2026-07-31 23:00). 47 qualify under the series rule (coverage of at least 95%, no gap over 72 hours); 10 fail (AEC, BHBA, NSB, SWPW for very low coverage; PSEI, SCEG, SPA, TEPC, WACM, WAUW for gaps). The list is committed as `results/step10/series_manifest.csv`.
+* Class B events fall on 42 qualifying series: 1,968 events in 262 storm groups. Twenty-four BAs in the event table have no EIA-930 series and are dropped.
+* Limit found: five qualifying series (CPLW, ISNE, MISO, PJM, SWPP) receive no Class B events, because the EIA-861 territory table does not map RTO footprints to counties. Events for these authorities enter only as hand-entered Class A rows from operator or regulator sources. Results for them therefore rest on Class A alone and are reported as such.
