@@ -51,7 +51,7 @@ def block_ids(index):
 def flag_top(score, pct=95):
     return (score > np.percentile(score, pct)).astype(int)
 
-def run_ba(ba, series, ev, families, n_seeds, ebench):
+def run_ba(ba, series, ev, families, n_seeds, ebench, neural_seeds=3):
     em, FAMILIES, build_features, feature_cols = (ebench[k] for k in ("event_mask", "FAMILIES", "build_features", "feature_cols"))
     FEATS = feature_cols("resid")
     F = build_features(series.index, series.to_numpy(float), SPD, WINDOW_DAYS, with_resid=True)
@@ -66,7 +66,7 @@ def run_ba(ba, series, ev, families, n_seeds, ebench):
     for s, e, _ in events:
         margin |= em(tt, s, e, pd.Timedelta(days=MARGIN_DAYS))
     blk = block_ids(tt)
-    jobs = [(n, sd) for n in families for sd in range(n_seeds if n in STOCHASTIC else 1)]
+    jobs = [(n, sd) for n in families for sd in range(neural_seeds if n in NEURAL else (n_seeds if n in STOCHASTIC else 1))]
     pieces = {j: [] for j in jobs}
     meta = []
     for k in range(N_BLOCKS):
@@ -123,6 +123,7 @@ def main():
     ap.add_argument("--families", nargs="+", default=DEFAULT_FAMILIES)
     ap.add_argument("--n-seeds", type=int, default=5)
     ap.add_argument("--bas", nargs="*", help="restrict to these BA codes (testing / batching)")
+    ap.add_argument("--neural-seeds", type=int, default=3, help="seeds for lstm_ae and transformer (Amendment 3)")
     ap.add_argument("--neural-first-n", type=int, default=None,
                     help="run neural families only on the first N BAs in code order (pre-registered subset rule)")
     a = ap.parse_args()
@@ -145,13 +146,13 @@ def main():
             print(ba, "done, skipping"); continue
         fams = [f for f in a.families if not (f in NEURAL and a.neural_first_n is not None and i >= a.neural_first_n)]
         print(f"[{i+1}/{len(bas)}] {ba}: {int((ev.ba == ba).sum())} events, families {len(fams)}", flush=True)
-        m, e = run_ba(ba, load_series(a.eia, ba), ev[ev.ba == ba], fams, a.n_seeds, eb)
+        m, e = run_ba(ba, load_series(a.eia, ba), ev[ev.ba == ba], fams, a.n_seeds, eb, a.neural_seeds)
         if m is None:
             print(ba, "no scoreable blocks, skipped"); continue
         e.to_csv(os.path.join(a.out, f"{ba}_events.csv"), index=False)
         m.to_csv(fm, index=False)
     json.dump(dict(families=a.families, n_seeds=a.n_seeds, blocks=N_BLOCKS, margin_days=MARGIN_DAYS,
-                   neural_first_n=a.neural_first_n), open(os.path.join(a.out, "run_config.json"), "w"), indent=2)
+                   neural_first_n=a.neural_first_n, neural_seeds=a.neural_seeds), open(os.path.join(a.out, "run_config.json"), "w"), indent=2)
 
 if __name__ == "__main__":
     main()

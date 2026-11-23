@@ -78,3 +78,9 @@ Class B labels are weather-derived and state-level, so a BA is mapped by populat
 * BA-level metrics: AUC-PR on all rows of the BA, timestamp-level F1 at the 5% budget, event-level recall with a one-day tolerance. VUS-PR, a secondary outcome, is computed afterwards from the saved scores and is not part of the runner.
 * Neural families: run on every BA if a timing test on a synthetic series, made before any real-data run, shows this is affordable. Otherwise they run on the first N BAs in code order, and N is written in this document before the real run starts. The classical families always run on every BA.
 * Class A events (hand-entered) are in `docs/step10_events.csv` before the real run starts; the runner reads Class A and Class B events together.
+
+**Amendment 3** (made before any real-data detector run; from a timing test on a synthetic series).
+* Timing test (synthetic series, 4 folds, one seed, lstm_ae and transformer, default settings, CPU): 20 minutes 11 seconds per authority. At five seeds this is about 100 minutes per authority and about 70 hours for 42 authorities, which is not affordable.
+* Neural families (lstm_ae, transformer): 3 seeds, and they run on the first 12 authorities in alphabetical code order of the final run list (qualifying series with at least one Class A or Class B event). This is the subset rule stated in Amendment 2, with N = 12. The estimate is about 12 hours.
+* All classical families run on every authority in the run list, with five seeds for isolation_forest and window_iforest and one for the deterministic ones, as in Amendment 2.
+* Neural results are reported on the 12-authority subset only, and the primary analysis of the classical families is on all authorities. Comparisons between neural and classical detectors use the same 12 authorities for both.
