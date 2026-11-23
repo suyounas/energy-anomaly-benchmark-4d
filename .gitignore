@@ -35,3 +35,6 @@ ercot_flags.csv
 results/
 results_run1.txt
 *.numbers
+
+# Step 10 raw downloads (hashes recorded in results/step10/SHA256SUMS.txt)
+data/step10/
