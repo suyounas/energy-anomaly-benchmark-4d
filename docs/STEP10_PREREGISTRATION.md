@@ -28,7 +28,7 @@ Two source classes, always reported separately and then pooled:
 * Target at least 40 independent storm groups across both classes. If fewer than 30 qualify, Step 10 is reported as descriptive and no ranking claim is made.
 
 ## Detectors and protocol (unchanged from Step 8 real runs)
-* The same detector set, features, equal-budget tuning, 5% alert budget, inductive fitting, five seeds and tolerance (one day) as the GB/ERCOT equal-budget runs. No new detectors are added after the runs start.
+* Detectors, features, budget and tolerance as in the GB/ERCOT equal-budget runs, specified in full in Amendment 2 (default configurations, no tuning). No new detectors are added after the runs start.
 * Training and scoring (see Amendment 1): blocked temporal cross-fitting. Each BA series over the data window is split into 4 contiguous blocks of equal length. For each block, the detector is fitted on the other three blocks with every event window and a 14-day margin around it removed (segment-aware windows, as in the equal-budget runs), then scores the held-out block. Scores are rank-normalised within each block, the 5% alert budget is applied within each block, and metrics are computed on the concatenated blocks. Stochastic detectors use five seeds.
 
 ## Outcomes
@@ -68,3 +68,13 @@ Class B labels are weather-derived and state-level, so a BA is mapped by populat
 * `scripts/step10_fetch_eia930.py` found 57 balancing authorities in the EIA-930 bulk files for 2019-07-01 to 2026-07-31 (the 2026 July-December file was available and the data run to 2026-07-31 23:00). 47 qualify under the series rule (coverage of at least 95%, no gap over 72 hours); 10 fail (AEC, BHBA, NSB, SWPW for very low coverage; PSEI, SCEG, SPA, TEPC, WACM, WAUW for gaps). The list is committed as `results/step10/series_manifest.csv`.
 * Class B events fall on 42 qualifying series: 1,968 events in 262 storm groups. Twenty-four BAs in the event table have no EIA-930 series and are dropped.
 * Limit found: five qualifying series (CPLW, ISNE, MISO, PJM, SWPP) receive no Class B events, because the EIA-861 territory table does not map RTO footprints to counties. Events for these authorities enter only as hand-entered Class A rows from operator or regulator sources. Results for them therefore rest on Class A alone and are reported as such.
+
+**Amendment 2** (made before any detector was run on real data; implemented in `scripts/step10_run.py`).
+* Detector families (12, all from `ebench.tuning.FAMILIES`): isolation_forest, knn_inductive, rolling_z, lstm_ae, transformer, diff_z, seasonal_naive, window_pca, window_knn, window_iforest, matrix_profile, spectral_residual. DBSCAN is excluded, as in the equal-budget runs (transductive, no fixed budget).
+* Configurations: the default configuration of each family, with no tuning. The GB/ERCOT equal-budget validation found that tuning changed little and the reported tables use the defaults; with 42 or more series and 4 folds each, per-fold tuning is not affordable. This replaces "equal-budget tuning" in the first version of this document.
+* Features: the residual set of the equal-budget runs (return, rolling mean, rolling standard deviation and rolling skew of the return over a 30-day window, plus the causal weekly seasonal-naive residual), built once per BA on the full hourly grid; the features use only past values.
+* Seeds: five for the stochastic families (isolation_forest, window_iforest, lstm_ae, transformer), one for the deterministic ones.
+* Per-event metrics (these define "events won" in the primary analysis): for each (BA, event) and detector, per-event AUC-PR with the event's rows as positives and the rows outside every event window as negatives; per-event coverage (share of the event's rows flagged at the 5% within-block budget); and detection (any flag inside the event window).
+* BA-level metrics: AUC-PR on all rows of the BA, timestamp-level F1 at the 5% budget, event-level recall with a one-day tolerance. VUS-PR, a secondary outcome, is computed afterwards from the saved scores and is not part of the runner.
+* Neural families: run on every BA if a timing test on a synthetic series, made before any real-data run, shows this is affordable. Otherwise they run on the first N BAs in code order, and N is written in this document before the real run starts. The classical families always run on every BA.
+* Class A events (hand-entered) are in `docs/step10_events.csv` before the real run starts; the runner reads Class A and Class B events together.
