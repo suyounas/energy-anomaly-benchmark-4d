@@ -80,7 +80,7 @@ def block_ids(index):
 def flag_top(score, pct=95):
     return (score > np.percentile(score, pct)).astype(int)
 
-def run_ba(ba, series, ev, families, n_seeds, ebench, neural_seeds=3):
+def run_ba(ba, series, ev, families, n_seeds, ebench, neural_seeds=3, save_path=None):
     em, FAMILIES, build_features, feature_cols = (ebench[k] for k in ("event_mask", "FAMILIES", "build_features", "feature_cols"))
     FEATS = feature_cols("resid")
     F = build_features(series.index, series.to_numpy(float), SPD, WINDOW_DAYS, with_resid=True)
@@ -123,8 +123,10 @@ def run_ba(ba, series, ev, families, n_seeds, ebench, neural_seeds=3):
     anyev = np.concatenate([m["any"] for m in meta])
     evm = [np.concatenate([m["ev"][i] for m in meta]) for i in range(len(events))]
     rows, erows = [], []
+    saved = {}
     for j in jobs:
         sc = np.concatenate(pieces[j])
+        saved[f"{j[0]}__{j[1]}"] = sc.astype(np.float32)
         flag = np.concatenate([flag_top(p) for p in pieces[j]])
         n, sd = j
         tsm = ebench["timestamp_level_prf"](yy, flag)
@@ -139,6 +141,8 @@ def run_ba(ba, series, ev, families, n_seeds, ebench, neural_seeds=3):
             ap = float(average_precision_score(m[sel].astype(int), sc[sel])) if m[sel].any() else np.nan
             erows.append(dict(ba=ba, event_id=eid, detector=n, seed=sd, n_pos=int(m.sum()), auc_pr_event=ap,
                               coverage=float(flag[m].mean()), detected=int(flag[m].any())))
+    if save_path:
+        np.savez_compressed(save_path, t=t.asi8, **saved)
     return pd.DataFrame(rows), pd.DataFrame(erows)
 
 def main():
@@ -178,7 +182,9 @@ def main():
             print(ba, "done, skipping"); continue
         fams = [f for f in a.families if not (f in NEURAL and a.neural_first_n is not None and i >= a.neural_first_n)]
         print(f"[{i+1}/{len(bas)}] {ba}: {int((ev.ba == ba).sum())} events, families {len(fams)}", flush=True)
-        m, e = run_ba(ba, load_series(a.eia, ba), ev[ev.ba == ba], fams, a.n_seeds, eb, a.neural_seeds)
+        os.makedirs(os.path.join(a.out, "scores"), exist_ok=True)
+        m, e = run_ba(ba, load_series(a.eia, ba), ev[ev.ba == ba], fams, a.n_seeds, eb, a.neural_seeds,
+                      save_path=os.path.join(a.out, "scores", f"{ba}_scores.npz"))
         if m is None:
             print(ba, "no scoreable blocks, skipped"); continue
         e.to_csv(os.path.join(a.out, f"{ba}_events.csv"), index=False)

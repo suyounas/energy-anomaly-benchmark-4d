@@ -92,3 +92,9 @@ Class B labels are weather-derived and state-level, so a BA is mapped by populat
 * Output: the runner writes `events_final.csv` with the dropped events removed and the recomputed groups. This is the event table for the analysis.
 * Class A entries: `docs/step10_events.csv` holds seven hand-entered events (CAISO 2020 and 2022, Uri 2021 for SPP and MISO, the 2021 Pacific Northwest heat, Winter Storm Elliott 2022, Winter Storms Gerri and Heather 2024, PJM Winter Storm Fern January 2026). Each row cites its operator or regulator source; authorities are limited to those named in or covered by the source and that qualify under the series rule. Dates are the stated storm or alert dates, not tuned to any data.
 * No event-selection threshold was changed, and no detector had been run when this was written.
+
+**Amendment 5** (made after the first classical run had finished and its pooled and split rankings had been inspected, and before the neural run produced any result; implemented in `scripts/step10_run.py`).
+* Problem: Amendment 2 says VUS-PR and the label-perturbation analysis (Analysis C) are computed afterwards from saved scores, but the runner did not save scores.
+* Change: storage only. The runner now also writes the rank-normalised held-out scores of every detector and seed, with timestamps, to `<out>/scores/<BA>_scores.npz`. Events, thresholds, detectors, configurations, seeds, blocks, margins, budget and metrics are unchanged.
+* Verification: the classical run was repeated with the new runner, and its metric files are compared with those of the first run (same seeds). Differences, if any, are reported.
+* Disclosure: the first classical run's pooled and split rankings were looked at before this change. The change cannot affect them.
