@@ -1,0 +1,89 @@
+{
+  "classical_all_bas": {
+    "n_events": 216,
+    "n_storm_groups": 73,
+    "n_bas": 39,
+    "descriptive_only": false,
+    "pooled": {
+      "kendall_w": 0.5242771115167437,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5068493150684932,
+      "loo_spearman_mean": 0.9985464202627921,
+      "loo_spearman_min": 0.9848069807617046,
+      "n_events": 216,
+      "n_storm_groups": 73
+    },
+    "class_A": {
+      "kendall_w": 0.8545454545454545,
+      "best_detector": "isolation_forest",
+      "frac_groups_best_is_best": 0.0,
+      "loo_spearman_mean": 0.9057792600832963,
+      "loo_spearman_min": 0.8875420937728943,
+      "n_events": 2,
+      "n_storm_groups": 2
+    },
+    "class_B": {
+      "kendall_w": 0.5241360878441006,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5068493150684932,
+      "loo_spearman_mean": 0.9987961179011892,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 214,
+      "n_storm_groups": 73
+    },
+    "family_heat": {
+      "kendall_w": 0.6580773723630866,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5238095238095238,
+      "loo_spearman_mean": 0.9997113997113997,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 106,
+      "n_storm_groups": 42
+    },
+    "family_cold": {
+      "kendall_w": 0.5428021713736,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5238095238095238,
+      "loo_spearman_mean": 0.9975466782452598,
+      "loo_spearman_min": 0.9757575757575757,
+      "n_events": 89,
+      "n_storm_groups": 21
+    },
+    "family_tropical": {
+      "kendall_w": 0.5505454545454546,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.4,
+      "loo_spearman_mean": 0.9933213426407382,
+      "loo_spearman_min": 0.960490759014502,
+      "n_events": 21,
+      "n_storm_groups": 10
+    },
+    "duration_short": {
+      "kendall_w": 0.4824209169888182,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5555555555555556,
+      "loo_spearman_mean": 0.9993265993265992,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 116,
+      "n_storm_groups": 54
+    },
+    "duration_long": {
+      "kendall_w": 0.6318642424242424,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.4,
+      "loo_spearman_mean": 0.9964839274179702,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 61,
+      "n_storm_groups": 25
+    },
+    "duration_medium": {
+      "kendall_w": 0.5820364307898934,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5263157894736842,
+      "loo_spearman_mean": 0.9953716466682563,
+      "loo_spearman_min": 0.9757575757575757,
+      "n_events": 39,
+      "n_storm_groups": 19
+    }
+  }
+}

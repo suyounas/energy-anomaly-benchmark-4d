@@ -1,0 +1,22 @@
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Perturbation & Spearman & Kendall $\tau$ & Best detector & Same top four \\
+\midrule
+baseline & 1.00 & 1.00 & Window iForest & yes \\
+shift\_-7 & 0.55 & 0.42 & Window iForest & no \\
+shift\_-3 & 0.77 & 0.64 & Window iForest & no \\
+shift\_-1 & 0.98 & 0.91 & Window iForest & yes \\
+shift\_+1 & 0.92 & 0.82 & Window iForest & no \\
+shift\_+3 & 0.92 & 0.82 & Window iForest & no \\
+shift\_+7 & 0.84 & 0.73 & Window iForest & no \\
+dilate\_1 & 0.99 & 0.96 & Window iForest & yes \\
+dilate\_3 & 0.95 & 0.87 & Window iForest & no \\
+leave\_one\_storm\_group\_out & 1.00 & -- & Window iForest & -- \\
+\bottomrule
+\end{tabular}
+\caption{Label perturbations: agreement of the pooled ranking with the baseline ranking.}
+\label{tab:step10-perturb}
+\end{table}

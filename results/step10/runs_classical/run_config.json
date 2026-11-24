@@ -1,0 +1,19 @@
+{
+  "families": [
+    "isolation_forest",
+    "knn_inductive",
+    "rolling_z",
+    "diff_z",
+    "seasonal_naive",
+    "window_pca",
+    "window_knn",
+    "window_iforest",
+    "matrix_profile",
+    "spectral_residual"
+  ],
+  "n_seeds": 5,
+  "blocks": 4,
+  "margin_days": 14,
+  "neural_first_n": null,
+  "neural_seeds": 3
+}

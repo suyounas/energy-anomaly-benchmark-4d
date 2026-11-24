@@ -1,0 +1,11 @@
+{
+  "families": [
+    "lstm_ae",
+    "transformer"
+  ],
+  "n_seeds": 5,
+  "blocks": 4,
+  "margin_days": 14,
+  "neural_first_n": 12,
+  "neural_seeds": 3
+}

@@ -1,0 +1,89 @@
+{
+  "classical_all_bas": {
+    "n_events": 216,
+    "n_storm_groups": 73,
+    "n_bas": 39,
+    "descriptive_only": false,
+    "pooled": {
+      "kendall_w": 0.5134171514355413,
+      "best_detector": "knn_inductive",
+      "frac_groups_best_is_best": 0.273972602739726,
+      "loo_spearman_mean": 0.9979452054794522,
+      "loo_spearman_min": 0.9666666666666667,
+      "n_events": 216,
+      "n_storm_groups": 73
+    },
+    "class_A": {
+      "kendall_w": 0.8833333333333333,
+      "best_detector": "isolation_forest",
+      "frac_groups_best_is_best": 0.5,
+      "loo_spearman_mean": 0.9288784237188525,
+      "loo_spearman_min": 0.912141875543738,
+      "n_events": 2,
+      "n_storm_groups": 2
+    },
+    "class_B": {
+      "kendall_w": 0.5132232438856571,
+      "best_detector": "knn_inductive",
+      "frac_groups_best_is_best": 0.273972602739726,
+      "loo_spearman_mean": 0.9983436721677288,
+      "loo_spearman_min": 0.9790880682441959,
+      "n_events": 214,
+      "n_storm_groups": 73
+    },
+    "family_heat": {
+      "kendall_w": 0.6671012849584278,
+      "best_detector": "isolation_forest",
+      "frac_groups_best_is_best": 0.21428571428571427,
+      "loo_spearman_mean": 1.0,
+      "loo_spearman_min": 1.0,
+      "n_events": 106,
+      "n_storm_groups": 42
+    },
+    "family_cold": {
+      "kendall_w": 0.5421768707482993,
+      "best_detector": "window_knn",
+      "frac_groups_best_is_best": 0.38095238095238093,
+      "loo_spearman_mean": 0.9976190476190476,
+      "loo_spearman_min": 0.9666666666666667,
+      "n_events": 89,
+      "n_storm_groups": 21
+    },
+    "family_tropical": {
+      "kendall_w": 0.579,
+      "best_detector": "isolation_forest",
+      "frac_groups_best_is_best": 0.2,
+      "loo_spearman_mean": 0.9891439588313278,
+      "loo_spearman_min": 0.9456149718939671,
+      "n_events": 21,
+      "n_storm_groups": 10
+    },
+    "duration_short": {
+      "kendall_w": 0.4566415180612711,
+      "best_detector": "knn_inductive",
+      "frac_groups_best_is_best": 0.3333333333333333,
+      "loo_spearman_mean": 0.9990740740740741,
+      "loo_spearman_min": 0.9666666666666667,
+      "n_events": 116,
+      "n_storm_groups": 54
+    },
+    "duration_long": {
+      "kendall_w": 0.6170133333333333,
+      "best_detector": "window_iforest",
+      "frac_groups_best_is_best": 0.4,
+      "loo_spearman_mean": 0.994828097337069,
+      "loo_spearman_min": 0.9790880682441959,
+      "n_events": 61,
+      "n_storm_groups": 25
+    },
+    "duration_medium": {
+      "kendall_w": 0.5995383194829178,
+      "best_detector": "isolation_forest",
+      "frac_groups_best_is_best": 0.05263157894736842,
+      "loo_spearman_mean": 0.9945170850747006,
+      "loo_spearman_min": 0.9666666666666667,
+      "n_events": 39,
+      "n_storm_groups": 19
+    }
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "classical_all_bas": {
+    "n_events": 1964,
+    "n_storm_groups": 262,
+    "n_bas": 45,
+    "descriptive_only": false,
+    "pooled": {
+      "kendall_w": 0.06349633506559094,
+      "best_detector": "window_iforest",
+      "frac_groups_best_is_best": 0.16793893129770993,
+      "loo_spearman_mean": 0.9998496238750825,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 1964,
+      "n_storm_groups": 262
+    },
+    "class_A": {
+      "kendall_w": 0.6482374768089054,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.5714285714285714,
+      "loo_spearman_mean": 0.9870011287024784,
+      "loo_spearman_min": 0.9848069807617046,
+      "n_events": 10,
+      "n_storm_groups": 7
+    },
+    "class_B": {
+      "kendall_w": 0.06343876972628211,
+      "best_detector": "window_iforest",
+      "frac_groups_best_is_best": 0.16793893129770993,
+      "loo_spearman_mean": 0.9999074716631967,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 1954,
+      "n_storm_groups": 262
+    },
+    "family_heat": {
+      "kendall_w": 0.38425048266599515,
+      "best_detector": "window_iforest",
+      "frac_groups_best_is_best": 0.28421052631578947,
+      "loo_spearman_mean": 0.9999999999999999,
+      "loo_spearman_min": 0.9999999999999999,
+      "n_events": 1051,
+      "n_storm_groups": 95
+    },
+    "family_cold": {
+      "kendall_w": 0.14047371675943104,
+      "best_detector": "matrix_profile",
+      "frac_groups_best_is_best": 0.39285714285714285,
+      "loo_spearman_mean": 0.9992207792207791,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 719,
+      "n_storm_groups": 140
+    },
+    "family_tropical": {
+      "kendall_w": 0.26557849601844846,
+      "best_detector": "spectral_residual",
+      "frac_groups_best_is_best": 0.034482758620689655,
+      "loo_spearman_mean": 0.9717972984589354,
+      "loo_spearman_min": 0.8693049274624923,
+      "n_events": 198,
+      "n_storm_groups": 29
+    },
+    "duration_long": {
+      "kendall_w": 0.1750227534864213,
+      "best_detector": "window_iforest",
+      "frac_groups_best_is_best": 0.3058823529411765,
+      "loo_spearman_mean": 0.9988591800356504,
+      "loo_spearman_min": 0.9878787878787878,
+      "n_events": 582,
+      "n_storm_groups": 85
+    },
+    "duration_short": {
+      "kendall_w": 0.04123163010558872,
+      "best_detector": "seasonal_naive",
+      "frac_groups_best_is_best": 0.21311475409836064,
+      "loo_spearman_mean": 0.9973338698658428,
+      "loo_spearman_min": 0.9272727272727272,
+      "n_events": 765,
+      "n_storm_groups": 183
+    },
+    "duration_medium": {
+      "kendall_w": 0.07885603439236658,
+      "best_detector": "knn_inductive",
+      "frac_groups_best_is_best": 0.16176470588235295,
+      "loo_spearman_mean": 0.9926893161375288,
+      "loo_spearman_min": 0.9272727272727272,
+      "n_events": 617,
+      "n_storm_groups": 136
+    }
+  }
+}
