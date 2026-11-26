@@ -14,6 +14,8 @@ superseded. The revised evaluation, tests and run-book are in
 revised manuscript in `paper/revised/`. The older markdown sections in
 `paper/` are an earlier draft and are superseded where `paper/README.md` says so.
 
+**Multi-authority study (Step 10):** a pre-registered comparison of twelve detector families on 1,973 events on 45 US balancing authorities. Pre-registration: `docs/STEP10_PREREGISTRATION.md`; step-by-step reproduction: `docs/REPRODUCE_STEP10.md`; analysed event catalogue: `results/step10/events_analysed.csv`; scripts: `scripts/step10_*.py`.
+
 ---
 
 ## Why this repository looks the way it does
