@@ -8,3 +8,14 @@ authors:
 repository-code: "https://github.com/suyounas/energy-anomaly-benchmark-4d"
 doi: "10.5281/zenodo.23981052"
 license: MIT
+preferred-citation:
+  type: generic
+  title: "Detector Rankings on Energy Time Series Are Conditional: A Pre-Registered Evaluation Protocol with Label-Validity Checks Across 45 US Balancing Authorities"
+  authors:
+    - family-names: Younas
+      given-names: Sulman
+  year: 2026
+  doi: "10.5281/zenodo.24572847"
+  publisher:
+    name: Zenodo
+  notes: "Preprint"

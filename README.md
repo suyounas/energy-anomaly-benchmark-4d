@@ -16,6 +16,8 @@ revised manuscript in `paper/revised/`. The older markdown sections in
 
 **Multi-authority study (Step 10):** a pre-registered comparison of twelve detector families on 1,973 events on 45 US balancing authorities. Pre-registration: `docs/STEP10_PREREGISTRATION.md`; step-by-step reproduction: `docs/REPRODUCE_STEP10.md`; analysed event catalogue: `results/step10/events_analysed.csv`; scripts: `scripts/step10_*.py`.
 
+**Preprint:** Younas, S. (2026). *Detector Rankings on Energy Time Series Are Conditional: A Pre-Registered Evaluation Protocol with Label-Validity Checks Across 45 US Balancing Authorities.* Zenodo. DOI: [10.5281/zenodo.24572847](https://doi.org/10.5281/zenodo.24572847)
+
 ---
 
 ## Why this repository looks the way it does
